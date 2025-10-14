@@ -1,0 +1,56 @@
+<section id="contact" class="py-20 bg-white relative overflow-hidden">
+  <div class="max-w-7xl mx-auto px-6">
+    <!-- Header -->
+    <div class="text-center mb-12 animate-fadeIn">
+      <h2 class="text-4xl font-bold text-gray-900 mb-2">Contact Us</h2>
+      <p class="text-gray-600">We’d love to hear from you — reach any of our branches below.</p>
+    </div>
+
+    <!-- Branch Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+      <!-- Lagos HQ -->
+      <div class="bg-red-50 rounded-2xl shadow-md p-6 text-center hover:shadow-xl transition-all duration-300">
+        <h3 class="text-xl font-semibold text-red-600 mb-2">Head Office – Lagos</h3>
+        <p class="text-gray-700 mb-1">12 Adeola Odeku Street, Victoria Island, Lagos</p>
+        <p class="text-gray-600">📞 +234 700 123 4567</p>
+        <p class="text-gray-600 mb-2">✉️ hq@rci.com.ng</p>
+        <button data-map="lagos" class="map-btn bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm mt-3">View Map</button>
+      </div>
+
+      <!-- Port Harcourt -->
+      <div class="bg-red-50 rounded-2xl shadow-md p-6 text-center hover:shadow-xl transition-all duration-300">
+        <h3 class="text-xl font-semibold text-red-600 mb-2">Port Harcourt Branch</h3>
+        <p class="text-gray-700 mb-1">45 Aba Road, GRA Phase 2, Port Harcourt</p>
+        <p class="text-gray-600">📞 +234 800 987 6543</p>
+        <p class="text-gray-600 mb-2">✉️ ph@rci.com.ng</p>
+        <button data-map="ph" class="map-btn bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm mt-3">View Map</button>
+      </div>
+
+      <!-- Abuja -->
+      <div class="bg-red-50 rounded-2xl shadow-md p-6 text-center hover:shadow-xl transition-all duration-300">
+        <h3 class="text-xl font-semibold text-red-600 mb-2">Abuja Branch</h3>
+        <p class="text-gray-700 mb-1">23 Aminu Kano Crescent, Wuse 2, Abuja</p>
+        <p class="text-gray-600">📞 +234 900 654 3210</p>
+        <p class="text-gray-600 mb-2">✉️ abuja@rci.com.ng</p>
+        <button data-map="abuja" class="map-btn bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm mt-3">View Map</button>
+      </div>
+    </div>
+
+    <!-- Contact Form -->
+    <div class="bg-gray-50 rounded-2xl shadow-md p-8 md:p-10 max-w-3xl mx-auto mb-10">
+      <h3 class="text-2xl font-semibold text-gray-900 mb-4 text-center">Send Us a Message</h3>
+      <form id="contactForm" class="space-y-5">
+        <input type="text" placeholder="Full Name" required class="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-red-400 outline-none">
+        <input type="email" placeholder="Email Address" required class="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-red-400 outline-none">
+        <textarea placeholder="Your Message..." rows="4" required class="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-red-400 outline-none"></textarea>
+        <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white py-3 rounded-lg font-medium shadow-md transition-all duration-300">Send Message</button>
+      </form>
+      <p id="formMessage" class="text-center mt-4 text-sm text-green-600 hidden">Message sent successfully!</p>
+    </div>
+
+    <!-- Map Section -->
+    <div id="mapSection" class="w-full h-80 rounded-2xl overflow-hidden shadow-lg transition-all duration-700 opacity-0 scale-95">
+      <iframe id="branchMap" src="" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+    </div>
+  </div>
+</section>
