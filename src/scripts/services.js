@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Load services HTML dynamically into index.html
   const servicesContainer = document.getElementById('services-section');
   console.log("Loading services.html...");
-  const response = await fetch('./components/services.html');
+  const response = await fetch('./src/pages/services.html');
   if (!response.ok) {
     console.error("Services load failed:", response.status);
     return;

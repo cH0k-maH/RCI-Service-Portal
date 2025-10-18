@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Load hero HTML dynamically into index.html
   const heroContainer = document.getElementById('hero-section');
   console.log("Loading hero.html...");
-  const response = await fetch('./components/hero.html');
+  const response = await fetch('./src/pages/hero.html');
   if (!response.ok) console.error("Hero load failed:", response.status);
   else console.log("Hero loaded!");
   const heroHTML = await response.text();

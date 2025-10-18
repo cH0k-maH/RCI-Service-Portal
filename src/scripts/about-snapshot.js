@@ -1,66 +1,123 @@
-document.addEventListener('DOMContentLoaded', async () => {
-  const snapshotContainer = document.getElementById('snapshot-section');
-  const response = await fetch('./components/about-snapshot.html');
-  if (!response.ok) {
-    console.error("About Snapshot load failed:", response.status);
-    return;
-  }
+document.addEventListener("DOMContentLoaded", async () => {
+  const snapshotContainer = document.getElementById("snapshot-section");
+  if (!snapshotContainer) return;
+
+  // Load the about-snapshot.html component
+  const response = await fetch("./src/pages/about-snapshot.html");
   const html = await response.text();
   snapshotContainer.innerHTML = html;
 
-  // Images (you can replace these later)
+  // === Gallery Controls ===
+  const gallery = document.getElementById("snapshot-gallery");
+  const prevBtn = document.getElementById("prev-btn");
+  const nextBtn = document.getElementById("next-btn");
+
+  // === Define image paths separately ===
   const images = [
-    'https://images.unsplash.com/photo-1607746882042-944635dfe10e',
-    'https://images.unsplash.com/photo-1521737604893-d14cc237f11d',
-    'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d',
-    'https://images.unsplash.com/photo-1573497019411-5077b6dc7624',
-    'https://images.unsplash.com/photo-1581090700227-1e37b190418e',
-    'https://images.unsplash.com/photo-1522202223600-eca5c3e90d47',
-    'https://images.unsplash.com/photo-1568605114967-8130f3a36994',
-    'https://images.unsplash.com/photo-1581093588401-22e8e3b78e7d',
-    'https://images.unsplash.com/photo-1519389950473-47ba0277781c',
-    'https://images.unsplash.com/photo-1557804506-669a67965ba0'
+    { id: 1, src: "./src/images/imc2010.png" },
+    { id: 1, src: "./src/images/imc2010.png" },
+    { id: 1, src: "./src/images/imc2010.png" },
+    { id: 1, src: "./src/images/imc2010.png" },
+    { id: 1, src: "./src/images/imc2010.png" },
+    { id: 1, src: "./src/images/imc2010.png" },
+    { id: 1, src: "./src/images/imc2010.png" },
+    { id: 1, src: "./src/images/imc2010.png" },
   ];
 
-  const gallery = document.getElementById('snapshot-gallery');
-  const nextBtn = document.getElementById('next-btn');
-  const prevBtn = document.getElementById('prev-btn');
+  const totalImages = images.length;
+  const imagesPerPage = 4;
+  let currentPage = 0;
 
-  let startIndex = 0;
-  const visibleCount = 4;
+  // === Display images ===
+  function displayImages() {
+    gallery.innerHTML = "";
+    const start = currentPage * imagesPerPage;
+    const end = start + imagesPerPage;
+    const visibleImages = images.slice(start, end);
 
-  const animations = ['fade', 'slide', 'zoom', 'scale'];
+    visibleImages.forEach((img) => {
+      const imgEl = document.createElement("img");
+      imgEl.src = img.src;
+      imgEl.alt = `Snapshot ${img.id}`;
+      imgEl.className =
+        "w-full h-48 object-cover rounded-xl shadow-md border border-gray-200 transform transition-transform duration-500 hover:scale-95 hover:shadow-xl cursor-pointer";
+      imgEl.addEventListener("click", () => openPopup(img.src, img.alt));
+      gallery.appendChild(imgEl);
+    });
 
-  function showImages() {
-    gallery.innerHTML = '';
+    prevBtn.disabled = currentPage === 0;
+    nextBtn.disabled = end >= totalImages;
+    prevBtn.classList.toggle("opacity-50", prevBtn.disabled);
+    nextBtn.classList.toggle("opacity-50", nextBtn.disabled);
+  }
 
-    const subset = images.slice(startIndex, startIndex + visibleCount);
-    subset.forEach((src) => {
-      const card = document.createElement('div');
-      const anim = animations[Math.floor(Math.random() * animations.length)];
+  // === Pagination ===
+  prevBtn.addEventListener("click", () => {
+    if (currentPage > 0) {
+      currentPage--;
+      displayImages();
+    }
+  });
 
-      card.className = `rounded-2xl shadow-md overflow-hidden transform transition-all duration-700 ${anim}`;
-      card.innerHTML = `
-        <img src="${src}" alt="Snapshot" class="w-full h-56 object-cover" />
-      `;
-      gallery.appendChild(card);
+  nextBtn.addEventListener("click", () => {
+    if ((currentPage + 1) * imagesPerPage < totalImages) {
+      currentPage++;
+      displayImages();
+    }
+  });
+
+  displayImages();
+
+  // === Popup Viewer (dark blurred background + zoom animation) ===
+  function openPopup(src, alt) {
+    const popup = document.createElement("div");
+    popup.id = "image-popup";
+    popup.className =
+      "fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-md z-50 transition-opacity duration-500";
+
+    popup.innerHTML = `
+      <div class="relative bg-white rounded-xl shadow-2xl p-4 animate-zoomIn max-w-md w-[90%]">
+        <button id="close-popup" class="absolute top-2 right-2 text-gray-600 text-2xl hover:text-red-500">&times;</button>
+        <img src="${src}" alt="${alt}" class="rounded-lg w-full h-auto object-contain" />
+      </div>
+    `;
+
+    document.body.appendChild(popup);
+
+    document.getElementById("close-popup").addEventListener("click", () => {
+      popup.remove();
+    });
+
+    popup.addEventListener("click", (e) => {
+      if (e.target === popup) popup.remove();
     });
   }
 
-  nextBtn.addEventListener('click', () => {
-    startIndex = (startIndex + visibleCount) % images.length;
-    showImages();
-  });
+  // === Animations (fade + zoom) ===
+  const style = document.createElement("style");
+  style.innerHTML = `
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
 
-  prevBtn.addEventListener('click', () => {
-    startIndex = (startIndex - visibleCount + images.length) % images.length;
-    showImages();
-  });
+    @keyframes zoomIn {
+      from { opacity: 0; transform: scale(0.8); }
+      to { opacity: 1; transform: scale(1); }
+    }
 
-  // Auto slide every 5 seconds
-  setInterval(() => {
-    nextBtn.click();
-  }, 5000);
+    .animate-fadeIn {
+      animation: fadeIn 0.3s ease-out;
+    }
 
-  showImages();
+    .animate-zoomIn {
+      animation: zoomIn 0.35s ease-out;
+    }
+
+    /* Optional: Slight frosted border glow */
+    #image-popup > div {
+      backdrop-filter: blur(8px);
+    }
+  `;
+  document.head.appendChild(style);
 });

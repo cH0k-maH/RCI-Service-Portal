@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', async () => {
   const contactContainer = document.getElementById('contact-section');
-  const response = await fetch('./components/contact.html');
+  const response = await fetch('./src/pages/contact.html');
   const html = await response.text();
   contactContainer.innerHTML = html;
 

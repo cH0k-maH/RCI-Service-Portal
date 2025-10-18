@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <base href="./">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>RCI Service Portal</title>
-  <link rel="stylesheet" href="../output.css" />
+  <link rel="stylesheet" href="./src/styles/output.css" />
 </head>
 <body class="bg-gradient-to-br from-red-50 to-gray-100 font-sans relative min-h-screen">
 
@@ -36,13 +37,20 @@
     <div id="footer-section"></div>
   </footer>
 
+  <!-- Login Modal (loaded dynamically) -->
+<div id="login-modal-container"></div>
+
+
+
+
   <!-- JS Scripts -->
-  <script src="../scripts/nav.js"></script>
-  <script src="../scripts/hero.js"></script>
-  <script src="./scripts/about-snapshot.js"></script>
-  <script src="../scripts/services.js"></script>
-  <script src="../scripts/contact.js"></script>
-  <script src="../scripts/footer.js"></script>
-  <script src="../scripts/smooth-scroll.js"></script>
+  <script src="./src/scripts/nav.js" defer></script>
+  <script src="./src/scripts/hero.js" defer></script>
+  <script src="./src/scripts/about-snapshot.js" defer></script>
+  <script src="./src/scripts/services.js" defer></script>
+  <script src="./src/scripts/contact.js" defer></script>
+  <script src="./src/scripts/footer.js" defer></script>
+  <script src="./src/scripts/smooth-scroll.js" defer></script>
+  <script src="./src/scripts/login.js" defer></script>
 </body>
 </html>
