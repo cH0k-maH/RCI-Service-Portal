@@ -40,7 +40,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       imgEl.src = img.src;
       imgEl.alt = `Snapshot ${img.id}`;
       imgEl.className =
-        "w-full h-48 object-cover rounded-xl shadow-md border border-gray-200 transform transition-transform duration-500 hover:scale-95 hover:shadow-xl cursor-pointer";
+        "w-full max-w-[250px] h-48 object-cover mx-auto rounded-xl shadow-md border border-gray-200 transform transition-transform duration-500 hover:scale-95 hover:shadow-xl cursor-pointer";
       imgEl.addEventListener("click", () => openPopup(img.src, img.alt));
       gallery.appendChild(imgEl);
     });

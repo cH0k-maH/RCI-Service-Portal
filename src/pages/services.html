@@ -1,46 +1,69 @@
 <section id="services" class="py-20 bg-gradient-to-b from-white to-red-50 relative overflow-hidden">
   <div class="max-w-7xl mx-auto px-6 text-center">
-    <!-- Section Heading -->
-    <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4">Our Core <span class="text-red-600">Services</span></h2>
+    <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4">
+      Our Core <span class="text-red-600">Services</span>
+    </h2>
     <p class="text-gray-600 max-w-2xl mx-auto mb-12">
       At RCI Document Solutions, we deliver innovative, reliable, and efficient document management systems tailored to your workflow.
     </p>
 
-    <!-- Service Cards -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-      
-      <!-- Service 1 -->
+
+      <!-- Printer Maintenance -->
       <div class="service-card bg-white/70 backdrop-blur-md rounded-2xl shadow-lg p-8 hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2">
         <div class="text-red-600 text-4xl mb-4">🖨️</div>
         <h3 class="text-xl font-semibold text-gray-800 mb-2">Printer Maintenance</h3>
-        <p class="text-gray-600 text-sm">Expert servicing and diagnostics for all Ricoh multifunction printers to keep your business running smoothly.</p>
+        <p class="text-gray-600 text-sm mb-4">Expert servicing and diagnostics for all Ricoh multifunction printers to keep your business running smoothly.</p>
+        <button class="learn-more-btn bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-700 transition" data-service="maintenance">Learn More</button>
       </div>
 
-      <!-- Service 2 -->
+      <!-- Document Workflow -->
       <div class="service-card bg-white/70 backdrop-blur-md rounded-2xl shadow-lg p-8 hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2">
         <div class="text-red-600 text-4xl mb-4">📄</div>
         <h3 class="text-xl font-semibold text-gray-800 mb-2">Document Workflow</h3>
-        <p class="text-gray-600 text-sm">Automate scanning, sharing, and approvals with our secure workflow integration tools.</p>
+        <p class="text-gray-600 text-sm mb-4">Automate scanning, sharing, and approvals with our secure workflow integration tools.</p>
+        <button class="learn-more-btn bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-700 transition" data-service="workflow">Learn More</button>
       </div>
 
-      <!-- Service 3 -->
+      <!-- Secure Cloud Print -->
       <div class="service-card bg-white/70 backdrop-blur-md rounded-2xl shadow-lg p-8 hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2">
         <div class="text-red-600 text-4xl mb-4">🔒</div>
         <h3 class="text-xl font-semibold text-gray-800 mb-2">Secure Cloud Print</h3>
-        <p class="text-gray-600 text-sm">Control print access and ensure data protection using encrypted cloud printing technology.</p>
+        <p class="text-gray-600 text-sm mb-4">Control print access and ensure data protection using encrypted cloud printing technology.</p>
+        <button class="learn-more-btn bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-700 transition" data-service="cloudprint">Learn More</button>
       </div>
 
-      <!-- Service 4 -->
+      <!-- Sales & Inventory -->
       <div class="service-card bg-white/70 backdrop-blur-md rounded-2xl shadow-lg p-8 hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2">
         <div class="text-red-600 text-4xl mb-4">💼</div>
         <h3 class="text-xl font-semibold text-gray-800 mb-2">Sales & Inventory</h3>
-        <p class="text-gray-600 text-sm">Track consumables, manage printer inventory, and generate reports seamlessly from your dashboard.</p>
+        <p class="text-gray-600 text-sm mb-4">Track consumables, manage printer inventory, and generate reports seamlessly from your dashboard.</p>
+        <button class="learn-more-btn bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-700 transition" data-service="sales">Learn More</button>
       </div>
 
     </div>
   </div>
 
-  <!-- Background blur decorations -->
+  <!-- Background blur effects -->
   <div class="absolute -top-10 -left-10 w-40 h-40 bg-red-100/40 rounded-full blur-3xl animate-float-slow"></div>
   <div class="absolute bottom-0 right-0 w-60 h-60 bg-red-200/30 rounded-full blur-3xl animate-float-slow delay-300"></div>
+
+  <!-- Modal -->
+  <div id="service-modal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-8 relative">
+      <button id="close-modal" class="absolute top-4 right-4 text-gray-500 hover:text-red-600 text-2xl">&times;</button>
+      <h3 id="modal-title" class="text-2xl font-bold text-gray-900 mb-4"></h3>
+      <p id="modal-content" class="text-gray-700 text-sm mb-6"></p>
+      <div id="contract-section" class="hidden">
+        <h4 class="font-semibold text-gray-800 mb-2">Available Contract Types:</h4>
+        <ul class="list-disc list-inside text-gray-700 text-sm space-y-1">
+          <li><strong>ASC Comprehensive:</strong> Full coverage including parts, labor, and preventive maintenance.</li>
+          <li><strong>Labour Only:</strong> RCI provides expert service; client supplies parts.</li>
+          <li><strong>Outsourced Printing:</strong> We manage and maintain all print operations on your behalf.</li>
+          <li><strong>Warranty:</strong> Service under manufacturer or RCI warranty terms.</li>
+          <li><strong>Time & Material:</strong> Pay only for actual service hours and parts used.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
 </section>

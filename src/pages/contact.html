@@ -11,7 +11,7 @@
       <!-- Lagos HQ -->
       <div class="bg-red-50 rounded-2xl shadow-md p-6 text-center hover:shadow-xl transition-all duration-300">
         <h3 class="text-xl font-semibold text-red-600 mb-2">Head Office – Lagos</h3>
-        <p class="text-gray-700 mb-1">12 Adeola Odeku Street, Victoria Island, Lagos</p>
+        <p class="text-gray-700 mb-1">Apprint Compound Oshodi–4th Gate 122/132, Oshodi-Apapa Express Way Iyana Isolo B/stop, Isolo Lagos</p>
         <p class="text-gray-600">📞 +234 700 123 4567</p>
         <p class="text-gray-600 mb-2">✉️ hq@rci.com.ng</p>
         <button data-map="lagos" class="map-btn bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm mt-3">View Map</button>
@@ -20,7 +20,7 @@
       <!-- Port Harcourt -->
       <div class="bg-red-50 rounded-2xl shadow-md p-6 text-center hover:shadow-xl transition-all duration-300">
         <h3 class="text-xl font-semibold text-red-600 mb-2">Port Harcourt Branch</h3>
-        <p class="text-gray-700 mb-1">45 Aba Road, GRA Phase 2, Port Harcourt</p>
+        <p class="text-gray-700 mb-1">Johannny International Mall, 112 East/West Road Rumudara, Port Harcourt</p>
         <p class="text-gray-600">📞 +234 800 987 6543</p>
         <p class="text-gray-600 mb-2">✉️ ph@rci.com.ng</p>
         <button data-map="ph" class="map-btn bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm mt-3">View Map</button>
@@ -29,12 +29,22 @@
       <!-- Abuja -->
       <div class="bg-red-50 rounded-2xl shadow-md p-6 text-center hover:shadow-xl transition-all duration-300">
         <h3 class="text-xl font-semibold text-red-600 mb-2">Abuja Branch</h3>
-        <p class="text-gray-700 mb-1">23 Aminu Kano Crescent, Wuse 2, Abuja</p>
+        <p class="text-gray-700 mb-1"> Suite 8 His Glory Plaza, Adetokunbo Ademola Crescent, Wuse II, Abuja</p>
         <p class="text-gray-600">📞 +234 900 654 3210</p>
         <p class="text-gray-600 mb-2">✉️ abuja@rci.com.ng</p>
         <button data-map="abuja" class="map-btn bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm mt-3">View Map</button>
       </div>
     </div>
+
+        <!-- Map Section (Hidden by default) -->
+        <div id="mapSection" class="hidden relative w-full h-80 rounded-2xl overflow-hidden shadow-lg transition-all duration-700">
+          <!-- Close Button -->
+          <button id="closeMap" class="absolute top-3 right-3 bg-white text-gray-700 hover:text-red-600 rounded-full shadow-md w-8 h-8 flex items-center justify-center font-bold z-10">✕</button>
+          
+          <iframe id="branchMap" src="" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+        </div>
+
+
 
     <!-- Contact Form -->
     <div class="bg-gray-50 rounded-2xl shadow-md p-8 md:p-10 max-w-3xl mx-auto mb-10">
@@ -48,9 +58,5 @@
       <p id="formMessage" class="text-center mt-4 text-sm text-green-600 hidden">Message sent successfully!</p>
     </div>
 
-    <!-- Map Section -->
-    <div id="mapSection" class="w-full h-80 rounded-2xl overflow-hidden shadow-lg transition-all duration-700 opacity-0 scale-95">
-      <iframe id="branchMap" src="" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
-    </div>
   </div>
 </section>
