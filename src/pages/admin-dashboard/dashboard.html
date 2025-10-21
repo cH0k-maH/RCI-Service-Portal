@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RCI Admin Dashboard</title>
+  <link href="../../styles/output.css" rel="stylesheet" />
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+  <!-- Wrapper -->
+  <div class="flex h-screen">
+
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white border-r border-gray-200 flex flex-col">
+      <div class="flex items-center justify-center h-16 border-b border-gray-200">
+        <h1 class="text-xl font-bold text-red-600">RCI Admin</h1>
+      </div>
+
+      <nav class="flex-1 px-4 py-6 space-y-2">
+        <a href="#" class="flex items-center px-4 py-2 rounded-lg bg-red-600 text-white font-semibold">
+          <i class="fas fa-chart-line mr-2"></i> Dashboard
+        </a>
+        <a href="#" class="flex items-center px-4 py-2 rounded-lg hover:bg-gray-100">
+          <i class="fas fa-users mr-2"></i> Manage Users
+        </a>
+        <a href="#" class="flex items-center px-4 py-2 rounded-lg hover:bg-gray-100">
+          <i class="fas fa-cogs mr-2"></i> Services
+        </a>
+        <a href="#" class="flex items-center px-4 py-2 rounded-lg hover:bg-gray-100">
+          <i class="fas fa-envelope-open-text mr-2"></i> Requests
+        </a>
+        <a href="#" class="flex items-center px-4 py-2 rounded-lg hover:bg-gray-100">
+          <i class="fas fa-chart-pie mr-2"></i> Reports
+        </a>
+        <a href="#" class="flex items-center px-4 py-2 rounded-lg hover:bg-gray-100">
+          <i class="fas fa-cog mr-2"></i> Settings
+        </a>
+      </nav>
+
+      <div class="p-4 border-t border-gray-200">
+        <button id="logout-btn" class="w-full bg-red-600 text-white py-2 rounded-lg hover:bg-red-700 transition">Logout</button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col">
+      
+      <!-- Topbar -->
+      <header class="bg-white shadow flex items-center justify-between px-6 py-4">
+        <h2 class="text-xl font-semibold">Dashboard</h2>
+        <div class="flex items-center space-x-4">
+          <span class="font-medium text-gray-700">Admin</span>
+          <img src="/src/images/imc2010.png" alt="Admin Avatar" class="w-10 h-10 rounded-full border border-gray-300 object-cover">
+        </div>
+      </header>
+
+      <!-- Dashboard Overview -->
+      <section class="p-6 grid grid-cols-1 sm:grid-cols-3 gap-6 bg-gray-100 flex-1 overflow-y-auto">
+
+        <!-- Card 1 -->
+        <div class="bg-white shadow rounded-xl p-5 text-center border-t-4 border-red-600">
+          <h3 class="text-gray-600 text-lg font-medium">Total Users</h3>
+          <p class="text-3xl font-bold text-black mt-2">124</p>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="bg-white shadow rounded-xl p-5 text-center border-t-4 border-green-600">
+          <h3 class="text-gray-600 text-lg font-medium">Active Services</h3>
+          <p class="text-3xl font-bold text-green-700 mt-2">32</p>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="bg-white shadow rounded-xl p-5 text-center border-t-4 border-yellow-500">
+          <h3 class="text-gray-600 text-lg font-medium">Pending Requests</h3>
+          <p class="text-3xl font-bold text-yellow-600 mt-2">5</p>
+        </div>
+
+      </section>
+
+    </main>
+  </div>
+
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <script src="../../scripts/dashboard.js"></script>
+</body>
+</html>

@@ -29,6 +29,24 @@ document.addEventListener("DOMContentLoaded", () => {
     const signupSection = document.getElementById("signup-section");
     const welcomeText = document.getElementById("welcome-text");
 
+    // === Admin Login Redirect ===
+if (loginForm) {
+  loginForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const email = document.getElementById("login-email")?.value.trim();
+    const password = document.getElementById("login-password")?.value.trim();
+
+    // Temporary hardcoded admin credentials
+    if (email === "admin@rci.com" && password === "admin123") {
+      localStorage.setItem("userRole", "admin");
+      alert("✅ Login successful! Redirecting to Admin Dashboard...");
+      window.location.href = "./src/pages/admin-dashboard/dashboard.html";
+    } else {
+      alert("❌ Invalid credentials. Please try again.");
+    }
+  });
+}
+
     // === Signup Subsections ===
     const accountChoice = document.getElementById("account-type-choice");
     const dealerForm = document.getElementById("dealer-form");

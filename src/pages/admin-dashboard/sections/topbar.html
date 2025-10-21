@@ -1,0 +1,21 @@
+<!-- src/pages/admin-dashboard/sections/topbar.html -->
+<header class="bg-white shadow-md flex items-center justify-between px-6 py-4">
+  <h2 class="text-xl font-semibold text-gray-800">Dashboard</h2>
+  <div class="flex items-center space-x-4">
+    <span class="text-gray-700 font-medium">Admin</span>
+    <button id="logout-btn" class="px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600 transition">
+      Logout
+    </button>
+    <img src="../../images/imc2010.png" alt="Admin Avatar" class="w-10 h-10 rounded-full border-2 border-gray-300 object-cover">
+  </div>
+</header>
+
+<script>
+  document.addEventListener("click", (e) => {
+    if (e.target.id === "logout-btn") {
+      localStorage.clear();
+      alert("You have been logged out.");
+      window.location.href = "../../../index.html";
+    }
+  });
+</script>
