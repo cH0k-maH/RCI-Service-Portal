@@ -1,17 +1,31 @@
-<!-- src/pages/admin-dashboard/sections/sidebar.html -->
-<aside class="fixed inset-y-0 left-0 w-64 bg-gray-900 text-white flex flex-col shadow-xl z-40">
-  <div class="flex items-center justify-center h-16 border-b border-gray-700">
-    <h1 class="text-xl font-semibold tracking-wide">RCI Admin</h1>
+<!-- Sidebar -->
+<div class="flex flex-col h-full border-r border-gray-200 bg-white">
+  <div class="flex items-center justify-center h-16 border-b border-gray-200">
+    <h1 class="text-xl font-bold text-red-600">RCI Admin</h1>
   </div>
 
   <nav class="flex-1 px-4 py-6 space-y-2">
-    <a href="#" data-section="overview" class="block py-2 px-3 rounded-lg hover:bg-gray-700 transition">📊 Overview</a>
-    <a href="#" data-section="reports" class="block py-2 px-3 rounded-lg hover:bg-gray-700 transition">📁 Reports</a>
-    <a href="#" data-section="users" class="block py-2 px-3 rounded-lg hover:bg-gray-700 transition">👥 Users</a>
-    <a href="#" data-section="settings" class="block py-2 px-3 rounded-lg hover:bg-gray-700 transition">⚙ Settings</a>
+    <button data-section="overview" class="flex items-center w-full px-4 py-2 rounded-lg bg-red-600 text-white font-semibold">
+      <i class="fas fa-chart-line mr-2"></i> Dashboard
+    </button>
+    <button data-section="users" class="flex items-center w-full px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100">
+      <i class="fas fa-users mr-2"></i> Manage Users
+    </button>
+    <button data-section="services" class="flex items-center w-full px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100">
+      <i class="fas fa-cogs mr-2"></i> Services
+    </button>
+    <button data-section="requests" class="flex items-center w-full px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100">
+      <i class="fas fa-envelope-open-text mr-2"></i> Requests
+    </button>
+    <button data-section="reports" class="flex items-center w-full px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100">
+      <i class="fas fa-chart-pie mr-2"></i> Reports
+    </button>
+    <button data-section="settings" class="flex items-center w-full px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100">
+      <i class="fas fa-cog mr-2"></i> Settings
+    </button>
   </nav>
 
-  <div class="border-t border-gray-700 p-4 text-center text-sm">
-    <button id="logoutBtn" class="w-full py-2 bg-red-600 hover:bg-red-700 rounded-lg font-semibold">Logout</button>
+  <div class="p-4 border-t border-gray-200">
+    <button id="logout-btn" class="w-full bg-red-600 text-white py-2 rounded-lg hover:bg-red-700 transition">Logout</button>
   </div>
-</aside>
+</div>

@@ -1,16 +1,34 @@
 <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
   <div class="bg-white p-6 rounded-xl shadow-md">
-    <h3 class="text-lg font-semibold mb-2 text-gray-800">Total Users</h3>
-    <p class="text-3xl font-bold text-indigo-600">124</p>
+    <h3 class="text-lg font-semibold mb-2 text-gray-800">Total Users (All Branches)</h3>
+    <p id="total-users" class="text-3xl font-bold text-indigo-600">124</p>
   </div>
 
   <div class="bg-white p-6 rounded-xl shadow-md">
     <h3 class="text-lg font-semibold mb-2 text-gray-800">Active Services</h3>
-    <p class="text-3xl font-bold text-green-600">32</p>
+    <p id="active-services" class="text-3xl font-bold text-green-600">32</p>
   </div>
 
   <div class="bg-white p-6 rounded-xl shadow-md">
     <h3 class="text-lg font-semibold mb-2 text-gray-800">Pending Requests</h3>
-    <p class="text-3xl font-bold text-red-600">5</p>
+    <p id="pending-requests" class="text-3xl font-bold text-red-600">5</p>
   </div>
 </section>
+
+<div class="mt-6 bg-white rounded-xl shadow-md p-6">
+  <label for="branch-select" class="block mb-2 font-semibold text-gray-700">Sort by Branch:</label>
+  <select id="branch-select" class="border border-gray-300 rounded-lg p-2">
+    <option>All Branches</option>
+    <option>Port Harcourt</option>
+    <option>Lagos</option>
+    <option>Abuja</option>
+  </select>
+</div>
+
+<script>
+  document.getElementById("branch-select").addEventListener("change", (e) => {
+    const branch = e.target.value;
+    console.log("Branch selected:", branch);
+    // Future: fetch stats for selected branch
+  });
+</script>

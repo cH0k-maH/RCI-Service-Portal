@@ -1,0 +1,38 @@
+<!-- src/pages/admin-dashboard/sections/requests.html -->
+<section class="space-y-6">
+  <h2 class="text-2xl font-semibold text-gray-800">Service Requests</h2>
+
+  <div class="bg-white shadow rounded-xl overflow-hidden">
+    <table class="min-w-full border border-gray-200 text-sm">
+      <thead class="bg-gray-100">
+        <tr class="text-left text-gray-700 font-semibold">
+          <th class="px-4 py-3 border-b">Request ID</th>
+          <th class="px-4 py-3 border-b">Client Name</th>
+          <th class="px-4 py-3 border-b">Service Type</th>
+          <th class="px-4 py-3 border-b">Branch</th>
+          <th class="px-4 py-3 border-b">Status</th>
+          <th class="px-4 py-3 border-b">Date</th>
+        </tr>
+      </thead>
+
+      <tbody id="requests-table" class="divide-y divide-gray-100 text-gray-700">
+        <tr>
+          <td class="px-4 py-3">REQ-1023</td>
+          <td class="px-4 py-3">John Doe</td>
+          <td class="px-4 py-3">Printer Maintenance</td>
+          <td class="px-4 py-3">Port Harcourt</td>
+          <td class="px-4 py-3 text-yellow-600 font-medium">Pending</td>
+          <td class="px-4 py-3">2025-10-21</td>
+        </tr>
+        <tr>
+          <td class="px-4 py-3">REQ-1024</td>
+          <td class="px-4 py-3">Jane Smith</td>
+          <td class="px-4 py-3">Toner Supply</td>
+          <td class="px-4 py-3">Lagos</td>
+          <td class="px-4 py-3 text-green-600 font-medium">Completed</td>
+          <td class="px-4 py-3">2025-10-19</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>

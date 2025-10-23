@@ -7,19 +7,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   }
 
-  // === LOGOUT HANDLER ===
-  document.addEventListener("click", (e) => {
-    if (e.target.id === "logout-btn") {
-      localStorage.clear();
-      window.location.href = "../../index.html";
-    }
-  });
-
-  // === Dynamic Section Loader (optional) ===
-  // Future feature: load dashboard sections dynamically if needed
-  console.log("Admin Dashboard Loaded Successfully");
-});
-
   // === PATHS ===
   const basePath = "../../pages/admin-dashboard/";
   const sectionsPath = `${basePath}sections/`;
@@ -29,11 +16,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   const sidebarContainer = document.getElementById("sidebar-container");
   const topbarContainer = document.getElementById("topbar-container");
 
-  // === LOAD COMPONENTS (Sidebar & Topbar) ===
+  // === LOAD COMPONENT FUNCTION ===
   async function loadComponent(container, file) {
     try {
-      const response = await fetch(file);
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const response = await fetch(file + `?v=${Date.now()}`);
       const html = await response.text();
       container.innerHTML = html;
     } catch (err) {
@@ -41,21 +27,21 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
+  // === LOAD SIDEBAR & TOPBAR ===
   await loadComponent(sidebarContainer, `${sectionsPath}sidebar.html`);
   await loadComponent(topbarContainer, `${sectionsPath}topbar.html`);
 
-  // === DEFAULT SECTION ===
+  // === LOAD DEFAULT SECTION ===
   await loadSection("overview");
 
-  // === LOAD SECTION DYNAMICALLY ===
+  // === LOAD SECTION FUNCTION ===
   async function loadSection(sectionName) {
     try {
-      const response = await fetch(`${sectionsPath}${sectionName}.html`);
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const response = await fetch(`${sectionsPath}${sectionName}.html?v=${Date.now()}`);
       const html = await response.text();
       dashboardContainer.innerHTML = html;
 
-      // Fade-in animation
+      // Simple fade-in animation
       dashboardContainer.classList.add("opacity-0", "translate-y-4");
       setTimeout(() => {
         dashboardContainer.classList.remove("opacity-0", "translate-y-4");
@@ -66,7 +52,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  // === SIDEBAR NAVIGATION ===
+  // === SIDEBAR NAVIGATION HANDLER ===
   document.addEventListener("click", (e) => {
     const link = e.target.closest("[data-section]");
     if (!link) return;
@@ -74,22 +60,22 @@ document.addEventListener("DOMContentLoaded", async () => {
     const section = link.dataset.section;
     loadSection(section);
 
-    // Highlight active section
+    // Highlight active button
     document.querySelectorAll("[data-section]").forEach((btn) => {
       btn.classList.remove("bg-red-600", "text-white");
-      btn.classList.add("text-gray-700", "hover:bg-red-50");
+      btn.classList.add("text-gray-700", "hover:bg-gray-100");
     });
-
     link.classList.add("bg-red-600", "text-white");
-    link.classList.remove("text-gray-700", "hover:bg-red-50");
+    link.classList.remove("text-gray-700", "hover:bg-gray-100");
   });
 
   // === LOGOUT HANDLER ===
   document.addEventListener("click", (e) => {
     if (e.target.id === "logout-btn") {
-      localStorage.removeItem("userRole");
+      localStorage.clear();
       alert("Logging out...");
-      window.location.href = "../../../index.html";
+      window.location.href ="../../../index.html";
     }
   });
 });
+
