@@ -15,6 +15,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const dashboardContainer = document.getElementById("dashboard-container");
   const sidebarContainer = document.getElementById("sidebar-container");
   const topbarContainer = document.getElementById("topbar-container");
+   
 
   // === LOAD COMPONENT FUNCTION ===
   async function loadComponent(container, file) {
@@ -34,12 +35,39 @@ document.addEventListener("DOMContentLoaded", async () => {
   // === LOAD DEFAULT SECTION ===
   await loadSection("overview");
 
+
+  // === LOAD SECTION SCRIPT ===
+function loadSectionScript(sectionName) {
+  const existingScript = document.getElementById("section-script");
+  if (existingScript) existingScript.remove();
+
+  const script = document.createElement("script");
+  script.src = `../../scripts/admin-dashboard/${sectionName}.js`;
+  script.id = "section-script";
+  script.defer = true;
+
+  document.body.appendChild(script);
+}
+
+
   // === LOAD SECTION FUNCTION ===
   async function loadSection(sectionName) {
     try {
       const response = await fetch(`${sectionsPath}${sectionName}.html?v=${Date.now()}`);
       const html = await response.text();
       dashboardContainer.innerHTML = html;
+      loadSectionScript(sectionName);
+
+    if (sectionName === "overview") {
+     const script = document.createElement("script");
+     script.src = "../../scripts/admin-dashboard/overview.js";
+     script.onload = () => {
+       if (window.initOverview) window.initOverview();
+     };
+    document.body.appendChild(script);
+}
+
+
 
       // Simple fade-in animation
       dashboardContainer.classList.add("opacity-0", "translate-y-4");

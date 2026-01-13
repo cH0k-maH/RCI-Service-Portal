@@ -1,34 +1,173 @@
-<section class="grid grid-cols-1 md:grid-cols-3 gap-6">
-  <div class="bg-white p-6 rounded-xl shadow-md">
-    <h3 class="text-lg font-semibold mb-2 text-gray-800">Total Users (All Branches)</h3>
-    <p id="total-users" class="text-3xl font-bold text-indigo-600">124</p>
+<!-- OVERVIEW DASHBOARD -->
+
+<div class="space-y-8">
+
+  <!-- KPI CARDS -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+    <!-- Total Users -->
+    <div class="kpi-card cursor-pointer bg-gray-100 border-l-4 border-red-600 p-5 rounded shadow hover:bg-gray-200"
+         data-target="users">
+      <h4 class="text-sm text-gray-600">Total Users</h4>
+      <p class="text-3xl font-bold text-black">128</p>
+    </div>
+
+    <!-- Active Services -->
+    <div class="kpi-card cursor-pointer bg-gray-100 border-l-4 border-black p-5 rounded shadow hover:bg-gray-200"
+         data-target="services">
+      <h4 class="text-sm text-gray-600">Active Services</h4>
+      <p class="text-3xl font-bold text-black">42</p>
+    </div>
+
+    <!-- Pending Requests -->
+    <div class="kpi-card cursor-pointer bg-gray-100 border-l-4 border-red-600 p-5 rounded shadow hover:bg-gray-200"
+         data-target="requests">
+      <h4 class="text-sm text-gray-600">Pending Requests</h4>
+      <p class="text-3xl font-bold text-black">9</p>
+    </div>
+
+    <!-- Total Branches -->
+    <div class="bg-gray-100 border-l-4 border-black p-5 rounded shadow">
+      <h4 class="text-sm text-gray-600">Branches</h4>
+      <p class="text-3xl font-bold text-black">6</p>
+    </div>
   </div>
 
-  <div class="bg-white p-6 rounded-xl shadow-md">
-    <h3 class="text-lg font-semibold mb-2 text-gray-800">Active Services</h3>
-    <p id="active-services" class="text-3xl font-bold text-green-600">32</p>
+<!-- TABLE CONTROLS -->
+<div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+
+  <!-- Branch Filter -->
+  <div>
+    <label class="text-sm font-medium text-gray-600 mr-2">Branch:</label>
+    <select id="branchFilter"
+            class="border rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-red-500">
+      <option value="lagos" selected>Lagos</option>
+      <option value="ph">Port Harcourt</option>
+      <option value="abuja">Abuja</option>
+    </select>
   </div>
 
-  <div class="bg-white p-6 rounded-xl shadow-md">
-    <h3 class="text-lg font-semibold mb-2 text-gray-800">Pending Requests</h3>
-    <p id="pending-requests" class="text-3xl font-bold text-red-600">5</p>
-  </div>
-</section>
+  <!-- View Toggle -->
+  <div class="flex gap-2">
+    <button id="weeklyBtn"
+            class="px-4 py-1 text-sm rounded bg-red-600 text-white">
+      Weekly
+    </button>
 
-<div class="mt-6 bg-white rounded-xl shadow-md p-6">
-  <label for="branch-select" class="block mb-2 font-semibold text-gray-700">Sort by Branch:</label>
-  <select id="branch-select" class="border border-gray-300 rounded-lg p-2">
-    <option>All Branches</option>
-    <option>Port Harcourt</option>
-    <option>Lagos</option>
-    <option>Abuja</option>
-  </select>
+    <button id="monthlyBtn"
+            class="px-4 py-1 text-sm rounded bg-gray-200 text-gray-700">
+      Monthly
+    </button>
+  </div>
+
 </div>
 
-<script>
-  document.getElementById("branch-select").addEventListener("change", (e) => {
-    const branch = e.target.value;
-    console.log("Branch selected:", branch);
-    // Future: fetch stats for selected branch
-  });
-</script>
+  
+<!-- WEEKLY MOVEMENT TABLE -->
+<section id="weeklyTable" class="bg-white rounded-xl shadow p-6 mb-10">
+  <h3 class="font-semibold text-lg mb-4">Weekly Movement</h3>
+
+  <table class="w-full border-collapse text-sm">
+    <thead class="bg-gray-100">
+      <tr>
+        <th class="border p-2 text-left">Day</th>
+        <th class="border p-2 text-left">Axis</th>
+        <th class="border p-2 text-left">Sales Visit</th>
+        <th class="border p-2 text-left">Service Visit</th>
+        <th class="border p-2 text-left">Personnel</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <!-- MONDAY -->
+      <tr class="day-row cursor-pointer hover:bg-red-50" data-day="monday">
+        <td class="border p-2 font-medium">Monday</td>
+        <td class="border p-2"></td>
+        <td class="border p-2"></td>
+        <td class="border p-2"></td>
+        <td class="border p-2"></td>
+      </tr>
+
+      <!-- TUESDAY -->
+      <tr class="day-row cursor-pointer hover:bg-red-50" data-day="tuesday">
+        <td class="border p-2 font-medium">Tuesday</td>
+        <td class="border p-2"></td>
+        <td class="border p-2"></td>
+        <td class="border p-2"></td>
+        <td class="border p-2"></td>
+      </tr>
+
+      <!-- WEDNESDAY -->
+      <tr class="day-row cursor-pointer hover:bg-red-50" data-day="wednesday">
+        <td class="border p-2 font-medium">Wednesday</td>
+        <td class="border p-2"></td>
+        <td class="border p-2"></td>
+        <td class="border p-2"></td>
+        <td class="border p-2"></td>
+      </tr>
+
+      <!-- THURSDAY -->
+      <tr class="day-row cursor-pointer hover:bg-red-50" data-day="thursday">
+        <td class="border p-2 font-medium">Thursday</td>
+        <td class="border p-2"></td>
+        <td class="border p-2"></td>
+        <td class="border p-2"></td>
+        <td class="border p-2"></td>
+      </tr>
+
+      <!-- FRIDAY -->
+      <tr class="day-row cursor-pointer hover:bg-red-50" data-day="friday">
+        <td class="border p-2 font-medium">Friday</td>
+        <td class="border p-2"></td>
+        <td class="border p-2"></td>
+        <td class="border p-2"></td>
+        <td class="border p-2"></td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+  <!-- MONTHLY MOVEMENT TABLE -->
+  <div id="monthlyTable" class="bg-white rounded shadow p-6 hidden">
+    <h3 class="text-lg font-semibold mb-4">Monthly Client Movement</h3>
+
+    <div class="overflow-x-auto max-h-[400px]">
+      <table class="min-w-full text-sm border">
+        <thead class="bg-gray-200 sticky top-0">
+          <tr>
+            <th class="border px-3 py-2 text-left">Client</th>
+            <th class="border px-3 py-2 text-left">Branch</th>
+            <th class="border px-3 py-2">1</th>
+            <th class="border px-3 py-2">2</th>
+            <th class="border px-3 py-2">3</th>
+            <th class="border px-3 py-2">4</th>
+            <th class="border px-3 py-2">5</th>
+            <!-- extend dynamically with JS later -->
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="hover:bg-gray-100">
+            <td class="border px-3 py-2">Dangote</td>
+            <td class="border px-3 py-2">Lagos</td>
+            <td class="day-cell">✔</td>
+            <td class="day-cell"></td>
+            <td class="day-cell">✔</td>
+            <td class="day-cell"></td>
+            <td class="day-cell">✔</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- RECENT ACTIVITY LOG -->
+  <div class="bg-white rounded shadow p-6">
+    <h3 class="text-lg font-semibold mb-4">Recent Activities</h3>
+
+    <ul class="space-y-2 text-sm">
+      <li>✔ Engineer uploaded job sheet – Benin (Today)</li>
+      <li>✔ Invoice collected – Lagos (Yesterday)</li>
+      <li>⚠ Pending approval – Abuja</li>
+    </ul>
+  </div>
+
+</div>

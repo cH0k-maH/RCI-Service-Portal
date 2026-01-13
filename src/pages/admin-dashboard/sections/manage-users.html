@@ -1,0 +1,53 @@
+<!-- MANAGE USERS -->
+
+<div class="space-y-6">
+
+  <!-- HEADER -->
+  <div class="flex justify-between items-center">
+    <h2 class="text-xl font-semibold">Manage Users</h2>
+
+    <button
+      id="addUserBtn"
+      class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
+      + Add User
+    </button>
+  </div>
+
+  <!-- USERS TABLE -->
+  <div class="bg-white rounded shadow overflow-x-auto">
+    <table class="min-w-full text-sm border-collapse">
+      <thead class="bg-gray-100">
+        <tr>
+          <th class="border px-4 py-2 text-left">Name</th>
+          <th class="border px-4 py-2 text-left">Email</th>
+          <th class="border px-4 py-2 text-left">Role</th>
+          <th class="border px-4 py-2 text-left">Branch</th>
+          <th class="border px-4 py-2 text-left">Status</th>
+          <th class="border px-4 py-2 text-center">Actions</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <!-- DUMMY ROW -->
+        <tr class="hover:bg-gray-50">
+          <td class="border px-4 py-2">John Doe</td>
+          <td class="border px-4 py-2">john@example.com</td>
+          <td class="border px-4 py-2">Admin</td>
+          <td class="border px-4 py-2">Lagos</td>
+          <td class="border px-4 py-2 text-green-600 font-medium">Active</td>
+          <td class="border px-4 py-2 text-center space-x-2">
+            <button class="edit-user text-blue-600 hover:underline">
+              Edit
+            </button>
+            <button class="toggle-user text-red-600 hover:underline">
+              Deactivate
+            </button>
+          </td>
+        </tr>
+
+        <!-- MORE USERS FROM BACKEND -->
+      </tbody>
+    </table>
+  </div>
+
+</div>
