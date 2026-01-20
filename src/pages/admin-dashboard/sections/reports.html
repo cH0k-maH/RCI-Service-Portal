@@ -1,10 +1,97 @@
-<section class="bg-white p-6 rounded-xl shadow-md">
-  <h3 class="text-2xl font-semibold text-gray-800 mb-4">Reports</h3>
-  <p class="text-gray-600 mb-2">Download and manage daily and monthly reports here.</p>
+<!-- REPORTS ANALYTICS -->
 
-  <div class="flex flex-col md:flex-row gap-4 mt-4">
-    <button class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">📅 Monthly Report</button>
-    <button class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">📆 Daily Report</button>
-    <button class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">📤 Export Data</button>
+<div class="space-y-6">
+
+  <!-- 1. Top Controls (Tabs & Export) -->
+  <div class="flex flex-col md:flex-row justify-between items-center bg-white p-2 rounded-lg shadow-sm">
+
+    <!-- Tabs -->
+    <div class="flex space-x-1 w-full md:w-auto overflow-x-auto">
+      <button class="report-tab active px-4 py-2 rounded-lg text-sm font-semibold transition bg-red-50 text-red-600"
+        data-target="overview">Overview</button>
+      <button class="report-tab px-4 py-2 rounded-lg text-sm font-medium text-gray-500 hover:bg-gray-50 transition"
+        data-target="branch-perf">Branch Performance</button>
+      <button class="report-tab px-4 py-2 rounded-lg text-sm font-medium text-gray-500 hover:bg-gray-50 transition"
+        data-target="activity">Activity Log</button>
+    </div>
+
+    <!-- Export Actions -->
+    <div class="flex gap-2 mt-3 md:mt-0">
+      <button id="btn-export-pdf"
+        class="flex items-center space-x-2 px-3 py-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 text-xs font-bold">
+        <i class="fas fa-file-pdf"></i> <span>Export PDF</span>
+      </button>
+      <button id="btn-export-csv"
+        class="flex items-center space-x-2 px-3 py-2 bg-green-50 text-green-600 rounded-lg hover:bg-green-100 text-xs font-bold">
+        <i class="fas fa-file-csv"></i> <span>Export CSV</span>
+      </button>
+    </div>
   </div>
-</section>
+
+  <!-- TAB CONTENT: OVERVIEW -->
+  <div id="view-overview" class="report-view space-y-6">
+
+    <!-- High Level KPIs -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-4 text-white shadow-lg">
+        <div class="text-blue-100 text-xs uppercase font-bold tracking-wider">Active Jobs</div>
+        <div class="text-3xl font-bold mt-1" id="rep-active-jobs">0</div>
+        <div class="text-blue-200 text-xs mt-2"><i class="fas fa-arrow-up"></i> 5% vs last week</div>
+      </div>
+      <div class="bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-xl p-4 text-white shadow-lg">
+        <div class="text-yellow-100 text-xs uppercase font-bold tracking-wider">Pending Approvals</div>
+        <div class="text-3xl font-bold mt-1" id="rep-pending-req">0</div>
+        <div class="text-yellow-200 text-xs mt-2">Needs attention</div>
+      </div>
+      <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-4 text-white shadow-lg">
+        <div class="text-green-100 text-xs uppercase font-bold tracking-wider">Completed (Mo)</div>
+        <div class="text-3xl font-bold mt-1" id="rep-completed-mo">0</div>
+        <div class="text-green-200 text-xs mt-2">On track</div>
+      </div>
+      <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-4 text-white shadow-lg">
+        <div class="text-purple-100 text-xs uppercase font-bold tracking-wider">Total Clients</div>
+        <div class="text-3xl font-bold mt-1" id="rep-total-clients">0</div>
+        <div class="text-purple-200 text-xs mt-2">+2 New this week</div>
+      </div>
+    </div>
+
+    <!-- Simple Chart Section (Visualizing Requests per Branch) -->
+    <div class="bg-white p-6 rounded-xl shadow">
+      <h4 class="text-lg font-bold text-gray-800 mb-4">Service Volume by Branch</h4>
+      <div class="space-y-4" id="visual-bars-container">
+        <!-- Bars injected by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB CONTENT: BRANCH PERFORMANCE -->
+  <div id="view-branch-perf" class="report-view hidden space-y-6">
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+      <table class="min-w-full text-sm divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left font-bold text-gray-500 uppercase">Branch</th>
+            <th class="px-6 py-3 text-center font-bold text-gray-500 uppercase">Total Services</th>
+            <th class="px-6 py-3 text-center font-bold text-gray-500 uppercase">Active</th>
+            <th class="px-6 py-3 text-center font-bold text-gray-500 uppercase">Pending Requests</th>
+            <th class="px-6 py-3 text-center font-bold text-gray-500 uppercase">Health</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200" id="branch-table-body">
+          <!-- Data -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- TAB CONTENT: ACTIVITY LOG -->
+  <div id="view-activity" class="report-view hidden">
+    <div class="bg-white rounded-lg shadow p-6">
+      <h4 class="text-lg font-bold text-gray-800 mb-4">System Activity Log</h4>
+      <div class="space-y-0" id="full-activity-log">
+        <!-- Timeline Items -->
+      </div>
+    </div>
+  </div>
+
+</div>

@@ -6,156 +6,165 @@
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
     <!-- Total Users -->
     <div class="kpi-card cursor-pointer bg-gray-100 border-l-4 border-red-600 p-5 rounded shadow hover:bg-gray-200"
-         data-target="users">
+      data-target="users">
       <h4 class="text-sm text-gray-600">Total Users</h4>
-      <p class="text-3xl font-bold text-black">128</p>
+      <p class="text-3xl font-bold text-black" id="ov-total-users">0</p>
     </div>
 
     <!-- Active Services -->
     <div class="kpi-card cursor-pointer bg-gray-100 border-l-4 border-black p-5 rounded shadow hover:bg-gray-200"
-         data-target="services">
+      data-target="services">
       <h4 class="text-sm text-gray-600">Active Services</h4>
-      <p class="text-3xl font-bold text-black">42</p>
+      <p class="text-3xl font-bold text-black" id="ov-active-services">0</p>
     </div>
 
     <!-- Pending Requests -->
     <div class="kpi-card cursor-pointer bg-gray-100 border-l-4 border-red-600 p-5 rounded shadow hover:bg-gray-200"
-         data-target="requests">
+      data-target="requests">
       <h4 class="text-sm text-gray-600">Pending Requests</h4>
-      <p class="text-3xl font-bold text-black">9</p>
+      <p class="text-3xl font-bold text-black" id="ov-pending-requests">0</p>
     </div>
 
     <!-- Total Branches -->
-    <div class="bg-gray-100 border-l-4 border-black p-5 rounded shadow">
+    <div class="bg-gray-100 border-l-4 border-black p-5 rounded shadow cursor-default">
       <h4 class="text-sm text-gray-600">Branches</h4>
-      <p class="text-3xl font-bold text-black">6</p>
+      <p class="text-3xl font-bold text-black" id="ov-total-branches">3</p>
     </div>
   </div>
 
-<!-- TABLE CONTROLS -->
-<div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+  <!-- TABLE CONTROLS -->
+  <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
 
-  <!-- Branch Filter -->
-  <div>
-    <label class="text-sm font-medium text-gray-600 mr-2">Branch:</label>
-    <select id="branchFilter"
-            class="border rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-red-500">
-      <option value="lagos" selected>Lagos</option>
-      <option value="ph">Port Harcourt</option>
-      <option value="abuja">Abuja</option>
-    </select>
+    <!-- Branch Filter -->
+    <div>
+      <label class="text-sm font-medium text-gray-600 mr-2">Branch:</label>
+      <select id="branchFilter"
+        class="border rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-red-500">
+        <option value="lagos" selected>Lagos</option>
+        <option value="ph">Port Harcourt</option>
+        <option value="abuja">Abuja</option>
+      </select>
+    </div>
+
+    <!-- View Toggle -->
+    <div class="flex gap-2">
+      <button id="weeklyBtn" class="px-4 py-1 text-sm rounded bg-red-600 text-white">
+        Weekly
+      </button>
+
+      <button id="monthlyBtn" class="px-4 py-1 text-sm rounded bg-gray-200 text-gray-700">
+        Monthly
+      </button>
+    </div>
+
   </div>
 
-  <!-- View Toggle -->
-  <div class="flex gap-2">
-    <button id="weeklyBtn"
-            class="px-4 py-1 text-sm rounded bg-red-600 text-white">
-      Weekly
-    </button>
 
-    <button id="monthlyBtn"
-            class="px-4 py-1 text-sm rounded bg-gray-200 text-gray-700">
-      Monthly
-    </button>
-  </div>
+  <!-- WEEKLY MOVEMENT TABLE -->
+  <section id="weeklyTable" class="bg-white rounded-xl shadow p-6 mb-10">
+    <h3 class="font-semibold text-lg mb-4">Weekly Movement</h3>
 
-</div>
+    <table class="w-full border-collapse text-sm">
+      <thead class="bg-gray-100">
+        <tr>
+          <th class="border p-2 text-left">Day</th>
+          <th class="border p-2 text-left">Axis</th>
+          <th class="border p-2 text-left">Sales Visit</th>
+          <th class="border p-2 text-left">Service Visit</th>
+          <th class="border p-2 text-left">Personnel</th>
+        </tr>
+      </thead>
 
-  
-<!-- WEEKLY MOVEMENT TABLE -->
-<section id="weeklyTable" class="bg-white rounded-xl shadow p-6 mb-10">
-  <h3 class="font-semibold text-lg mb-4">Weekly Movement</h3>
+      <tbody>
+        <!-- MONDAY -->
+        <tr class="day-row cursor-pointer hover:bg-red-50" data-day="monday">
+          <td class="border p-2 font-medium">Monday</td>
+          <td class="border p-2"></td>
+          <td class="border p-2"></td>
+          <td class="border p-2"></td>
+          <td class="border p-2"></td>
+        </tr>
 
-  <table class="w-full border-collapse text-sm">
-    <thead class="bg-gray-100">
-      <tr>
-        <th class="border p-2 text-left">Day</th>
-        <th class="border p-2 text-left">Axis</th>
-        <th class="border p-2 text-left">Sales Visit</th>
-        <th class="border p-2 text-left">Service Visit</th>
-        <th class="border p-2 text-left">Personnel</th>
-      </tr>
-    </thead>
+        <!-- TUESDAY -->
+        <tr class="day-row cursor-pointer hover:bg-red-50" data-day="tuesday">
+          <td class="border p-2 font-medium">Tuesday</td>
+          <td class="border p-2"></td>
+          <td class="border p-2"></td>
+          <td class="border p-2"></td>
+          <td class="border p-2"></td>
+        </tr>
 
-    <tbody>
-      <!-- MONDAY -->
-      <tr class="day-row cursor-pointer hover:bg-red-50" data-day="monday">
-        <td class="border p-2 font-medium">Monday</td>
-        <td class="border p-2"></td>
-        <td class="border p-2"></td>
-        <td class="border p-2"></td>
-        <td class="border p-2"></td>
-      </tr>
+        <!-- WEDNESDAY -->
+        <tr class="day-row cursor-pointer hover:bg-red-50" data-day="wednesday">
+          <td class="border p-2 font-medium">Wednesday</td>
+          <td class="border p-2"></td>
+          <td class="border p-2"></td>
+          <td class="border p-2"></td>
+          <td class="border p-2"></td>
+        </tr>
 
-      <!-- TUESDAY -->
-      <tr class="day-row cursor-pointer hover:bg-red-50" data-day="tuesday">
-        <td class="border p-2 font-medium">Tuesday</td>
-        <td class="border p-2"></td>
-        <td class="border p-2"></td>
-        <td class="border p-2"></td>
-        <td class="border p-2"></td>
-      </tr>
+        <!-- THURSDAY -->
+        <tr class="day-row cursor-pointer hover:bg-red-50" data-day="thursday">
+          <td class="border p-2 font-medium">Thursday</td>
+          <td class="border p-2"></td>
+          <td class="border p-2"></td>
+          <td class="border p-2"></td>
+          <td class="border p-2"></td>
+        </tr>
 
-      <!-- WEDNESDAY -->
-      <tr class="day-row cursor-pointer hover:bg-red-50" data-day="wednesday">
-        <td class="border p-2 font-medium">Wednesday</td>
-        <td class="border p-2"></td>
-        <td class="border p-2"></td>
-        <td class="border p-2"></td>
-        <td class="border p-2"></td>
-      </tr>
+        <!-- FRIDAY -->
+        <tr class="day-row cursor-pointer hover:bg-red-50" data-day="friday">
+          <td class="border p-2 font-medium">Friday</td>
+          <td class="border p-2"></td>
+          <td class="border p-2"></td>
+          <td class="border p-2"></td>
+          <td class="border p-2"></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
 
-      <!-- THURSDAY -->
-      <tr class="day-row cursor-pointer hover:bg-red-50" data-day="thursday">
-        <td class="border p-2 font-medium">Thursday</td>
-        <td class="border p-2"></td>
-        <td class="border p-2"></td>
-        <td class="border p-2"></td>
-        <td class="border p-2"></td>
-      </tr>
+  <!-- MONTHLY ACTIVITY MATRIX (Now Standard Calendar) -->
+  <div id="monthlyTable" class="bg-white rounded-xl shadow p-6 hidden flex-col">
+    <div class="flex justify-between items-center mb-6">
+      <h3 class="text-lg font-bold text-gray-800" id="calendarTitle">Month Year</h3>
+      <div class="flex items-center gap-4">
+        <!-- Calendar Navigation -->
+        <div class="flex gap-2">
+          <button id="prevMonth" class="p-1 hover:bg-gray-100 rounded">
+            << /button>
+              <button id="nextMonth" class="p-1 hover:bg-gray-100 rounded">></button>
+        </div>
 
-      <!-- FRIDAY -->
-      <tr class="day-row cursor-pointer hover:bg-red-50" data-day="friday">
-        <td class="border p-2 font-medium">Friday</td>
-        <td class="border p-2"></td>
-        <td class="border p-2"></td>
-        <td class="border p-2"></td>
-        <td class="border p-2"></td>
-      </tr>
-    </tbody>
-  </table>
-</section>
+        <!-- Legend -->
+        <div class="flex items-center gap-2 text-xs text-gray-500 border-l pl-4">
+          <span class="flex items-center gap-1">
+            <div class="w-2 h-2 bg-blue-500 rounded-full"></div> Service
+          </span>
+          <span class="flex items-center gap-1">
+            <div class="w-2 h-2 bg-red-500 rounded-full"></div> Request
+          </span>
+        </div>
+      </div>
+    </div>
 
-  <!-- MONTHLY MOVEMENT TABLE -->
-  <div id="monthlyTable" class="bg-white rounded shadow p-6 hidden">
-    <h3 class="text-lg font-semibold mb-4">Monthly Client Movement</h3>
+    <!-- Calendar Grid -->
+    <div class="w-full">
+      <!-- Weekday Headers -->
+      <div class="grid grid-cols-7 mb-2 text-center text-sm font-semibold text-gray-500">
+        <div>Sun</div>
+        <div>Mon</div>
+        <div>Tue</div>
+        <div>Wed</div>
+        <div>Thu</div>
+        <div>Fri</div>
+        <div>Sat</div>
+      </div>
 
-    <div class="overflow-x-auto max-h-[400px]">
-      <table class="min-w-full text-sm border">
-        <thead class="bg-gray-200 sticky top-0">
-          <tr>
-            <th class="border px-3 py-2 text-left">Client</th>
-            <th class="border px-3 py-2 text-left">Branch</th>
-            <th class="border px-3 py-2">1</th>
-            <th class="border px-3 py-2">2</th>
-            <th class="border px-3 py-2">3</th>
-            <th class="border px-3 py-2">4</th>
-            <th class="border px-3 py-2">5</th>
-            <!-- extend dynamically with JS later -->
-          </tr>
-        </thead>
-        <tbody>
-          <tr class="hover:bg-gray-100">
-            <td class="border px-3 py-2">Dangote</td>
-            <td class="border px-3 py-2">Lagos</td>
-            <td class="day-cell">✔</td>
-            <td class="day-cell"></td>
-            <td class="day-cell">✔</td>
-            <td class="day-cell"></td>
-            <td class="day-cell">✔</td>
-          </tr>
-        </tbody>
-      </table>
+      <!-- Days Grid -->
+      <div id="calendar-grid" class="grid grid-cols-7 gap-2">
+        <!-- JS will populate days -->
+      </div>
     </div>
   </div>
 
@@ -163,10 +172,8 @@
   <div class="bg-white rounded shadow p-6">
     <h3 class="text-lg font-semibold mb-4">Recent Activities</h3>
 
-    <ul class="space-y-2 text-sm">
-      <li>✔ Engineer uploaded job sheet – Benin (Today)</li>
-      <li>✔ Invoice collected – Lagos (Yesterday)</li>
-      <li>⚠ Pending approval – Abuja</li>
+    <ul class="space-y-2 text-sm" id="ov-activity-log">
+      <!-- Injected via JS -->
     </ul>
   </div>
 
