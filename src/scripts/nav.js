@@ -1,11 +1,9 @@
 // src/scripts/nav.js
 document.addEventListener("DOMContentLoaded", async () => {
-  // === Load navbar HTML dynamically ===
-  const navbarContainer = document.getElementById("navbar");
-  const response = await fetch("./src/pages/nav.html");
- 
-  const navHTML = await response.text();
-  navbarContainer.innerHTML = navHTML;
+  // === Load navbar HTML dynamically using DomLoader ===
+  const navbarContainer = await window.DomLoader.loadComponent("#navbar", "./src/pages/nav.html");
+
+  if (!navbarContainer) return;
 
   // === Select Key Elements (guarded) ===
   const menuBtn = document.getElementById("menu-btn");
@@ -95,38 +93,26 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 
   // === Handle Login Button (Desktop + Mobile) ===
-  function attachLoginHandlers() {
-    const loginButtons = Array.from(navbarContainer.querySelectorAll("#login-btn, a")).filter((el) => {
-      const t = (el.textContent || "").trim().toLowerCase();
-      return el.id === "login-btn" || t === "login";
-    });
+  // Note: We simply trigger the global showLoginModal function if it exists
+  const loginButtons = Array.from(navbarContainer.querySelectorAll("#login-btn, a")).filter((el) => {
+    const t = (el.textContent || "").trim().toLowerCase();
+    return el.id === "login-btn" || t === "login";
+  });
 
-    const overlay = document.getElementById("login-overlay");
-    if (!overlay) return;
+  loginButtons.forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      // Close mobile menu if open
+      if (mobileMenu && !mobileMenu.classList.contains("hidden")) {
+        toggleMenu(false);
+      }
 
-    loginButtons.forEach((btn) => {
-      if (!btn.dataset.bound) {
-        btn.dataset.bound = "true";
-        btn.addEventListener("click", (e) => {
-          e.preventDefault();
-          if (mobileMenu && !mobileMenu.classList.contains("hidden")) {
-            toggleMenu(false);
-            setTimeout(() => {
-              overlay.classList.remove("hidden");
-              document.body.classList.add("overflow-hidden");
-            }, 350);
-          } else {
-            overlay.classList.remove("hidden");
-            document.body.classList.add("overflow-hidden");
-          }
-        });
+      if (typeof window.showLoginModal === 'function') {
+        window.showLoginModal();
+      } else {
+        console.warn("Login modal not loaded yet.");
       }
     });
-  }
-
-  const observer = new MutationObserver(() => {
-    const overlay = document.getElementById("login-overlay");
-    if (overlay) attachLoginHandlers();
   });
-  observer.observe(document.body, { childList: true, subtree: true });
+
 });

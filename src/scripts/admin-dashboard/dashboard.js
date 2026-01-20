@@ -1,109 +1,134 @@
 // src/scripts/admin-dashboard/dashboard.js
 document.addEventListener("DOMContentLoaded", async () => {
-  // === LOGIN CHECK ===
+  // ===============================
+  // LOGIN CHECK
+  // ===============================
   if (localStorage.getItem("userRole") !== "admin") {
     alert("Access denied. Please log in as admin.");
     window.location.href = "../../index.html";
     return;
   }
 
-  // === PATHS ===
+  // ===============================
+  // PATHS
+  // ===============================
   const basePath = "../../pages/admin-dashboard/";
-  const sectionsPath = `${basePath}sections/`;
+  const sectionsPath = basePath + "sections/";
+  const scriptsPath = "../../scripts/admin-dashboard/";
 
-  // === CONTAINERS ===
+  // ===============================
+  // CONTAINERS
+  // ===============================
   const dashboardContainer = document.getElementById("dashboard-container");
   const sidebarContainer = document.getElementById("sidebar-container");
   const topbarContainer = document.getElementById("topbar-container");
-   
 
-  // === LOAD COMPONENT FUNCTION ===
-  async function loadComponent(container, file) {
+  if (!dashboardContainer || !sidebarContainer || !topbarContainer) {
+    console.error("Dashboard containers missing");
+    return;
+  }
+
+  // ===============================
+  // LOAD STATIC COMPONENT (SIDEBAR / TOPBAR)
+  // ===============================
+  async function loadComponent(container, filePath) {
     try {
-      const response = await fetch(file + `?v=${Date.now()}`);
-      const html = await response.text();
-      container.innerHTML = html;
+      const res = await fetch(filePath + "?v=" + Date.now());
+      if (!res.ok) throw new Error("Failed to load " + filePath);
+      container.innerHTML = await res.text();
     } catch (err) {
-      console.error(`Error loading ${file}:`, err);
+      console.error(err);
     }
   }
 
-  // === LOAD SIDEBAR & TOPBAR ===
-  await loadComponent(sidebarContainer, `${sectionsPath}sidebar.html`);
-  await loadComponent(topbarContainer, `${sectionsPath}topbar.html`);
+  await loadComponent(sidebarContainer, sectionsPath + "sidebar.html");
+  await loadComponent(topbarContainer, sectionsPath + "topbar.html");
 
-  // === LOAD DEFAULT SECTION ===
-  await loadSection("overview");
-
-
-  // === LOAD SECTION SCRIPT ===
-function loadSectionScript(sectionName) {
-  const existingScript = document.getElementById("section-script");
-  if (existingScript) existingScript.remove();
-
-  const script = document.createElement("script");
-  script.src = `../../scripts/admin-dashboard/${sectionName}.js`;
-  script.id = "section-script";
-  script.defer = true;
-
-  document.body.appendChild(script);
-}
-
-
-  // === LOAD SECTION FUNCTION ===
+  // ===============================
+  // LOAD SECTION (HTML + JS AUTO)
+  // ===============================
   async function loadSection(sectionName) {
     try {
-      const response = await fetch(`${sectionsPath}${sectionName}.html?v=${Date.now()}`);
-      const html = await response.text();
-      dashboardContainer.innerHTML = html;
-      loadSectionScript(sectionName);
+      // ---- Load HTML ----
+      const res = await fetch(
+        sectionsPath + sectionName + ".html?v=" + Date.now()
+      );
+      if (!res.ok) throw new Error("Section not found: " + sectionName);
 
-    if (sectionName === "overview") {
-     const script = document.createElement("script");
-     script.src = "../../scripts/admin-dashboard/overview.js";
-     script.onload = () => {
-       if (window.initOverview) window.initOverview();
-     };
-    document.body.appendChild(script);
-}
+      dashboardContainer.innerHTML = await res.text();
 
+      // ---- Remove old section JS ----
+      const oldScript = document.getElementById("section-script");
+      if (oldScript) oldScript.remove();
 
+      // ---- Load section JS if it exists ----
+      const script = document.createElement("script");
+      script.src = scriptsPath + sectionName + ".js?v=" + Date.now();
+      script.id = "section-script";
+      script.defer = true;
 
-      // Simple fade-in animation
+      script.onload = () => {
+        // Convert hyphenated section name (e.g., "manage-users") to camelCase ("manageUsers")
+        const camelCaseName = sectionName.replace(/-([a-z])/g, (g) => g[1].toUpperCase());
+        const initFnName = "init" + camelCaseName.charAt(0).toUpperCase() + camelCaseName.slice(1);
+        const initFn = window[initFnName];
+
+        if (typeof initFn === "function") initFn();
+      };
+
+      script.onerror = () => {
+        // JS is optional — no error, no blank page
+        console.info(`No JS file for section: ${sectionName}`);
+      };
+
+      document.body.appendChild(script);
+
+      // ---- Simple animation ----
       dashboardContainer.classList.add("opacity-0", "translate-y-4");
       setTimeout(() => {
         dashboardContainer.classList.remove("opacity-0", "translate-y-4");
         dashboardContainer.classList.add("opacity-100");
       }, 50);
     } catch (err) {
-      console.error(`Error loading ${sectionName}:`, err);
+      console.error("Error loading section:", err);
+      dashboardContainer.innerHTML =
+        "<p class='text-red-500'>Failed to load section.</p>";
     }
   }
 
-  // === SIDEBAR NAVIGATION HANDLER ===
-  document.addEventListener("click", (e) => {
-    const link = e.target.closest("[data-section]");
-    if (!link) return;
+  // ===============================
+  // DEFAULT SECTION
+  // ===============================
+  loadSection("overview");
 
-    const section = link.dataset.section;
+  // ===============================
+  // SIDEBAR NAVIGATION
+  // ===============================
+  document.addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-section]");
+    if (!btn) return;
+
+    const section = btn.dataset.section;
     loadSection(section);
 
-    // Highlight active button
-    document.querySelectorAll("[data-section]").forEach((btn) => {
-      btn.classList.remove("bg-red-600", "text-white");
-      btn.classList.add("text-gray-700", "hover:bg-gray-100");
+    // Active state
+    document.querySelectorAll("[data-section]").forEach((el) => {
+      el.classList.remove("bg-red-600", "text-white");
+      el.classList.add("text-gray-700", "hover:bg-gray-100");
     });
-    link.classList.add("bg-red-600", "text-white");
-    link.classList.remove("text-gray-700", "hover:bg-gray-100");
+
+    btn.classList.add("bg-red-600", "text-white");
+    btn.classList.remove("text-gray-700", "hover:bg-gray-100");
   });
 
-  // === LOGOUT HANDLER ===
+  // ===============================
+  // LOGOUT
+  // ===============================
   document.addEventListener("click", (e) => {
     if (e.target.id === "logout-btn") {
       localStorage.clear();
       alert("Logging out...");
-      window.location.href ="../../../index.html";
+      window.location.href = "../../../index.html";
     }
   });
 });
-

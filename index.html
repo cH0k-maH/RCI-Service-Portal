@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <base href="./">
   <meta charset="UTF-8" />
@@ -7,6 +8,7 @@
   <title>RCI Service Portal</title>
   <link rel="stylesheet" href="./src/styles/output.css" />
 </head>
+
 <body class="bg-gradient-to-br from-red-50 to-gray-100 font-sans relative min-h-screen">
 
   <!-- Navbar -->
@@ -38,10 +40,17 @@
   </footer>
 
   <!-- Login Modal (loaded dynamically) -->
-<div id="login-modal-container"></div>
+  <div id="login-modal-container"></div>
 
 
 
+
+  <!-- Core Libraries -->
+  <script src="./src/scripts/lib/auth-service.js" defer></script>
+  <script src="./src/scripts/lib/user-service.js" defer></script>
+  <script src="./src/scripts/lib/service-service.js" defer></script>
+  <script src="./src/scripts/lib/request-service.js" defer></script>
+  <script src="./src/scripts/lib/dom-loader.js" defer></script>
 
   <!-- JS Scripts -->
   <script src="./src/scripts/nav.js" defer></script>
@@ -53,4 +62,5 @@
   <script src="./src/scripts/smooth-scroll.js" defer></script>
   <script src="./src/scripts/login.js" defer></script>
 </body>
+
 </html>

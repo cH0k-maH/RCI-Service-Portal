@@ -1,38 +1,227 @@
-<!-- src/pages/admin-dashboard/sections/services.html -->
-<section class="space-y-6">
-  <h2 class="text-2xl font-semibold text-gray-800">Available Services</h2>
+<!-- SERVICES MANAGEMENT -->
 
-  <div class="bg-white shadow rounded-xl overflow-hidden">
-    <table class="min-w-full border border-gray-200 text-sm">
-      <thead class="bg-gray-100">
-        <tr class="text-left text-gray-700 font-semibold">
-          <th class="px-4 py-3 border-b">Service ID</th>
-          <th class="px-4 py-3 border-b">Service Name</th>
-          <th class="px-4 py-3 border-b">Category</th>
-          <th class="px-4 py-3 border-b">Branch</th>
-          <th class="px-4 py-3 border-b">Price</th>
-          <th class="px-4 py-3 border-b">Status</th>
-        </tr>
-      </thead>
+<div class="space-y-6">
 
-      <tbody id="services-table" class="divide-y divide-gray-100 text-gray-700">
-        <tr>
-          <td class="px-4 py-3">SRV-2001</td>
-          <td class="px-4 py-3">Printer Setup & Installation</td>
-          <td class="px-4 py-3">Hardware Support</td>
-          <td class="px-4 py-3">Abuja</td>
-          <td class="px-4 py-3">₦15,000</td>
-          <td class="px-4 py-3 text-green-600 font-medium">Active</td>
-        </tr>
-        <tr>
-          <td class="px-4 py-3">SRV-2002</td>
-          <td class="px-4 py-3">Toner Supply</td>
-          <td class="px-4 py-3">Consumables</td>
-          <td class="px-4 py-3">Port Harcourt</td>
-          <td class="px-4 py-3">₦8,000</td>
-          <td class="px-4 py-3 text-red-600 font-medium">Inactive</td>
-        </tr>
-      </tbody>
-    </table>
+  <!-- 1. KPI Cards (Quick Filters) -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="service-kpi-container">
+    <!-- Total Services -->
+    <div
+      class="bg-white p-4 rounded-xl shadow border-l-4 border-gray-600 cursor-pointer hover:bg-gray-50 transition kpi-card"
+      data-filter="All">
+      <div class="text-gray-500 text-xs uppercase tracking-wider font-semibold">Total Services</div>
+      <div class="text-2xl font-bold text-gray-800 mt-1" id="kpi-total">0</div>
+    </div>
+
+    <!-- Active -->
+    <div
+      class="bg-white p-4 rounded-xl shadow border-l-4 border-blue-500 cursor-pointer hover:bg-blue-50 transition kpi-card"
+      data-filter="Active">
+      <div class="text-blue-500 text-xs uppercase tracking-wider font-semibold">Active</div>
+      <div class="text-2xl font-bold text-blue-700 mt-1" id="kpi-active">0</div>
+    </div>
+
+    <!-- Pending -->
+    <div
+      class="bg-white p-4 rounded-xl shadow border-l-4 border-yellow-500 cursor-pointer hover:bg-yellow-50 transition kpi-card"
+      data-filter="Pending">
+      <div class="text-yellow-600 text-xs uppercase tracking-wider font-semibold">Pending</div>
+      <div class="text-2xl font-bold text-yellow-700 mt-1" id="kpi-pending">0</div>
+    </div>
+
+    <!-- Completed -->
+    <div
+      class="bg-white p-4 rounded-xl shadow border-l-4 border-green-500 cursor-pointer hover:bg-green-50 transition kpi-card"
+      data-filter="Completed">
+      <div class="text-green-600 text-xs uppercase tracking-wider font-semibold">Completed</div>
+      <div class="text-2xl font-bold text-green-700 mt-1" id="kpi-completed">0</div>
+    </div>
   </div>
-</section>
+
+  <!-- 2. Controls & Filters -->
+  <div class="flex flex-col md:flex-row justify-between items-center gap-4 bg-white p-4 rounded-lg shadow-sm">
+
+    <div class="flex flex-col md:flex-row gap-3 w-full md:w-auto flex-1">
+      <!-- Search -->
+      <div class="relative w-full md:w-64">
+        <input type="text" id="service-search" placeholder="Search client, ID, engineer..."
+          class="pl-10 pr-4 py-2 border rounded-lg focus:ring-red-600 focus:border-red-600 w-full text-sm">
+        <i class="fas fa-search absolute left-3 top-2.5 text-gray-400"></i>
+      </div>
+
+      <!-- Branch Filter -->
+      <select id="service-branch-filter"
+        class="border rounded-lg px-3 py-2 text-sm focus:ring-red-600 focus:border-red-600 bg-gray-50">
+        <option value="">All Branches</option>
+        <option value="Lagos">Lagos</option>
+        <option value="Abuja">Abuja</option>
+        <option value="Port Harcourt">Port Harcourt</option>
+      </select>
+
+      <!-- Type Filter -->
+      <select id="service-type-filter"
+        class="border rounded-lg px-3 py-2 text-sm focus:ring-red-600 focus:border-red-600 bg-gray-50">
+        <option value="">All Types</option>
+        <option value="Maintenance">Maintenance</option>
+        <option value="Installation">Installation</option>
+        <option value="Support">Support</option>
+      </select>
+    </div>
+
+    <!-- Add Button -->
+    <button id="addServiceBtn"
+      class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 shadow flex items-center justify-center text-sm font-medium whitespace-nowrap">
+      <i class="fas fa-plus mr-2"></i> Create Service
+    </button>
+  </div>
+
+  <!-- 3. Main Data Table -->
+  <div class="bg-white rounded-lg shadow overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="min-w-full text-sm divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left font-semibold text-gray-500 uppercase tracking-wider">Service ID</th>
+            <th class="px-6 py-3 text-left font-semibold text-gray-500 uppercase tracking-wider">Client & Type</th>
+            <th class="px-6 py-3 text-left font-semibold text-gray-500 uppercase tracking-wider">Assigned To</th>
+            <th class="px-6 py-3 text-left font-semibold text-gray-500 uppercase tracking-wider">Branch</th>
+            <th class="px-6 py-3 text-left font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+            <th class="px-6 py-3 text-left font-semibold text-gray-500 uppercase tracking-wider">Date</th>
+            <th class="px-6 py-3 text-center font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="services-table-body" class="bg-white divide-y divide-gray-200">
+          <!-- Body injected via JS -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Empty State -->
+    <div id="no-services-msg" class="hidden p-12 text-center">
+      <div class="text-gray-300 text-5xl mb-3"><i class="fas fa-clipboard-list"></i></div>
+      <p class="text-gray-500 text-lg">No services found.</p>
+      <p class="text-gray-400 text-sm">Try adjusting your filters or search terms.</p>
+    </div>
+  </div>
+
+  <!-- 4. Recent Activity (Bottom Log) -->
+  <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+    <h4 class="text-sm font-bold text-gray-700 uppercase mb-3"><i class="fas fa-history mr-2"></i>Recent Activity</h4>
+    <div id="service-activity-log" class="space-y-2 text-sm text-gray-600">
+      <!-- Logs injected via JS -->
+      <div class="flex items-center gap-2">
+        <div class="w-2 h-2 rounded-full bg-blue-500"></div> System initialized.
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
+<!-- SERVICE DETAIL / EDIT MODAL -->
+<div id="service-modal-overlay"
+  class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center overflow-y-auto pt-10 pb-10">
+  <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl mx-4 relative animate-fadeIn my-auto">
+
+    <div
+      class="bg-gray-50 px-6 py-4 border-b border-gray-200 flex justify-between items-center rounded-t-xl sticky top-0 z-10">
+      <h3 id="service-modal-title" class="text-lg font-bold text-gray-800">Create New Service</h3>
+      <button id="close-service-modal" class="text-gray-400 hover:text-red-600 text-2xl transition">&times;</button>
+    </div>
+
+    <form id="service-form" class="p-6 space-y-6 max-h-[80vh] overflow-y-auto">
+      <input type="hidden" id="service-id">
+
+      <!-- Row 1: Client & Type -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Client / Customer</label>
+          <!-- Populated from UserService -->
+          <div class="relative">
+            <select id="input-client" required
+              class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-red-600 focus:border-red-600 px-3 py-2 bg-white">
+              <option value="">Select Client...</option>
+            </select>
+            <div class="absolute right-8 top-2.5 text-xs text-blue-600 cursor-pointer hover:underline"
+              title="Go to User Management to add new clients">Manage Clients</div>
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Service Type</label>
+          <select id="input-type" required
+            class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-red-600 focus:border-red-600 px-3 py-2 bg-white">
+            <option value="Maintenance">Maintenance</option>
+            <option value="Installation">Installation</option>
+            <option value="Support">Support</option>
+            <option value="Repair">Repair</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Row 2: Branch & Engineer -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Branch</label>
+          <select id="input-branch" required
+            class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-red-600 focus:border-red-600 px-3 py-2 bg-white">
+            <option value="Lagos">Lagos</option>
+            <option value="Abuja">Abuja</option>
+            <option value="Port Harcourt">Port Harcourt</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Assigned Engineer</label>
+          <!-- Populated from UserService (Staff with role Engineer) -->
+          <select id="input-engineer"
+            class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-red-600 focus:border-red-600 px-3 py-2 bg-white">
+            <option value="Unassigned">Unassigned</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Service Description / Notes</label>
+        <textarea id="input-description" rows="3" required
+          class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-red-600 focus:border-red-600 px-3 py-2"
+          placeholder="Describe the task..."></textarea>
+      </div>
+
+      <!-- Status (Edit Mode Only usually, but useful to have) -->
+      <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+        <label class="block text-sm font-bold text-gray-700 mb-2">Completion Status</label>
+        <div class="flex flex-wrap gap-4">
+          <label class="flex items-center space-x-2 cursor-pointer">
+            <input type="radio" name="status" value="Active" class="text-blue-600 focus:ring-blue-500">
+            <span class="text-sm font-medium text-blue-700 bg-blue-50 px-2 py-1 rounded">Active</span>
+          </label>
+          <label class="flex items-center space-x-2 cursor-pointer">
+            <input type="radio" name="status" value="Pending" class="text-yellow-600 focus:ring-yellow-500">
+            <span class="text-sm font-medium text-yellow-700 bg-yellow-50 px-2 py-1 rounded">Pending</span>
+          </label>
+          <label class="flex items-center space-x-2 cursor-pointer">
+            <input type="radio" name="status" value="Completed" class="text-green-600 focus:ring-green-500">
+            <span class="text-sm font-medium text-green-700 bg-green-50 px-2 py-1 rounded">Completed</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Timeline (View Only) -->
+      <div id="timeline-section" class="hidden">
+        <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Service Timeline</h4>
+        <div class="border-l-2 border-gray-200 pl-4 space-y-3" id="timeline-container">
+          <!-- Injected via JS -->
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="pt-4 flex justify-end space-x-3 border-t border-gray-200">
+        <button type="button" id="cancel-service-modal"
+          class="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">Cancel</button>
+        <button type="submit"
+          class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 shadow-md transition transform hover:scale-105">Save
+          Service</button>
+      </div>
+
+    </form>
+  </div>
+</div>
