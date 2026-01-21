@@ -3,13 +3,31 @@
 window.initOverview = function () {
   console.log("Overview Dashboard initialized");
 
+  // === 0. Context & Permission Helpers ===
+  const currentUser = {
+    role: localStorage.getItem("staffType"), // "manager"
+    branch: localStorage.getItem("branch") || "Lagos",
+    isAdmin: window.AuthService.getRole() === 'admin'
+  };
+
+  const isGlobalAdmin = currentUser.isAdmin || (currentUser.role && currentUser.role.toUpperCase() === 'ADMIN');
+  const userBranch = currentUser.branch;
+
   // === 1. Populate KPIs with REAL Data ===
   function updateKPIs() {
-    // Data from Services
-    const users = window.UserService ? window.UserService.getAllUsers() : [];
-    const services = window.ServiceService ? window.ServiceService.getAllServices() : [];
-    const requests = window.RequestService ? window.RequestService.getAllRequests() : [];
-    const settings = window.SettingsService ? window.SettingsService.getSettings() : { branches: [1, 2, 3] };
+    // Data (Potential for optimization: Fetch from Backend with filter)
+    let users = window.UserService ? window.UserService.getAllUsers() : [];
+    let services = window.ServiceService ? window.ServiceService.getAllServices() : [];
+    let requests = window.RequestService ? window.RequestService.getAllRequests() : [];
+    let settings = window.SettingsService ? window.SettingsService.getSettings() : { branches: [{ active: true }, { active: true }, { active: true }] };
+
+    // Apply Filters for Branch Managers
+    if (!isGlobalAdmin) {
+      users = users.filter(u => u.branch === userBranch);
+      services = services.filter(s => s.branch === userBranch); // Assuming services have branch
+      requests = requests.filter(r => r.branch === userBranch);
+      // settings.branches // Can't filter really, just showing count
+    }
 
     // Update Texts
     if (document.getElementById("ov-total-users"))
@@ -21,8 +39,15 @@ window.initOverview = function () {
     if (document.getElementById("ov-pending-requests"))
       document.getElementById("ov-pending-requests").textContent = requests.filter(r => r.status === 'Pending').length;
 
-    if (document.getElementById("ov-total-branches"))
-      document.getElementById("ov-total-branches").textContent = settings.branches ? settings.branches.filter(b => b.active).length : 3;
+    if (document.getElementById("ov-total-branches")) {
+      if (isGlobalAdmin) {
+        document.getElementById("ov-total-branches").textContent = settings.branches ? settings.branches.filter(b => b.active).length : 3;
+      } else {
+        // For Manager, maybe show "1" (Their Branch) or hide the card context
+        document.getElementById("ov-total-branches").textContent = "1";
+        document.getElementById("ov-total-branches").previousElementSibling.textContent = "My Branch"; // Hacky DOM access
+      }
+    }
   }
 
   // === 2. Navigation Logic ===
@@ -30,7 +55,7 @@ window.initOverview = function () {
     card.addEventListener("click", () => {
       const target = card.dataset.target; // "users", "services", "requests"
       if (target) {
-        const sidebarLink = document.querySelector(`a[data-section="${target}"]`);
+        const sidebarLink = document.querySelector(`button[data-section="${target}"]`);
         if (sidebarLink) sidebarLink.click();
       }
     });
@@ -41,11 +66,20 @@ window.initOverview = function () {
     const container = document.getElementById("ov-activity-log");
     if (!container || !window.ReportService) return;
 
-    const logs = window.ReportService.getActivityLog().slice(0, 5); // Top 5
+    let logs = window.ReportService.getActivityLog();
+
+    // Filter Logs for Manager
+    if (!isGlobalAdmin) {
+      logs = logs.filter(l => l.branch === userBranch);
+    }
+
+    // Take Top 5 after filter
+    logs = logs.slice(0, 5);
+
     container.innerHTML = "";
 
     if (logs.length === 0) {
-      container.innerHTML = `<li class="text-gray-400 italic">No recent activity.</li>`;
+      container.innerHTML = `<li class="text-gray-400 italic">No recent activity for ${userBranch}.</li>`;
       return;
     }
 
@@ -86,7 +120,17 @@ window.initOverview = function () {
     const daysInMonth = new Date(year, month + 1, 0).getDate();
 
     // B. Get Data & Filter by Branch
-    const selectedBranch = branchFilter ? branchFilter.value.toLowerCase() : 'all'; // e.g., "lagos", "ph", "abuja"
+    // RBAC: If not Admin, force selectedBranch
+    let selectedBranch = 'all';
+    if (!isGlobalAdmin) {
+      selectedBranch = userBranch.toLowerCase();
+      if (branchFilter) {
+        branchFilter.value = selectedBranch;
+        branchFilter.disabled = true; // Lock the filter
+      }
+    } else {
+      selectedBranch = branchFilter ? branchFilter.value.toLowerCase() : 'all';
+    }
 
     // Helper: Check if item matches branch
     // Note: Real data structure usually has a 'branch' property. 
@@ -97,6 +141,9 @@ window.initOverview = function () {
       // If we need to look up client branch (services usually have clientName)
       const client = window.UserService ? window.UserService.getAllUsers().find(u => u.name === item.clientName) : null;
       if (client && client.branch && client.branch.toLowerCase().includes(selectedBranch)) return true;
+
+      // If 'all' and is admin (implied by execution flow reaching here validly only if admin when 'all')
+      if (selectedBranch === 'all') return true;
 
       return false;
     };

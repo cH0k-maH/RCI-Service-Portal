@@ -2,7 +2,13 @@
 
 window.initReports = function () {
     console.log("Reports Analytics initialized");
-    if (localStorage.getItem("userRole") !== "admin") return;
+    // === Auth & RBAC ===
+    const currentUser = {
+        role: localStorage.getItem("staffType"),
+        branch: localStorage.getItem("branch"),
+        isAdmin: window.AuthService.getRole() === 'admin'
+    };
+    const isGlobalAdmin = currentUser.isAdmin || (currentUser.role && currentUser.role.toUpperCase() === 'ADMIN');
 
     // === UI Elements ===
     const tabs = document.querySelectorAll(".report-tab");
@@ -38,8 +44,35 @@ window.initReports = function () {
 
     // === 2. Render Overview (KPIs & Charts) ===
     function renderOverview() {
-        const overall = window.ReportService.getOverallKPIs();
-        const branchStats = window.ReportService.getBranchStats();
+        let overall = window.ReportService.getOverallKPIs();
+        let branchStats = window.ReportService.getBranchStats();
+
+        // RBAC: Filter Data for Branch Managers
+        if (!isGlobalAdmin) {
+            // Re-calculate Overall based on single branch
+            // Note: ReportService.getOverallKPIs returns pre-calculated totals from all data.
+            // We should ideally have ReportService.getKPIs(branch).
+            // For now, let's just filter what we have or re-calc locally.
+            // Actually, best to fetch raw data and count for the branch.
+
+            const services = window.ServiceService.getAllServices().filter(s => s.branch === currentUser.branch);
+            const requests = window.RequestService.getAllRequests().filter(r => r.branch === currentUser.branch);
+            const clients = window.UserService.getAllUsers().filter(u => (u.type === 'customer' || u.type === 'dealer') && u.branch === currentUser.branch);
+
+            overall = {
+                activeJobs: services.filter(s => s.status === 'Active').length,
+                pendingApprovals: requests.filter(r => r.status === 'Pending').length,
+                completedJobsMonth: services.filter(s => s.status === 'Completed').length,
+                totalClients: clients.length
+            };
+
+            // Filter Branch Stats to only the user's branch
+            const filteredStats = {};
+            if (branchStats[currentUser.branch]) {
+                filteredStats[currentUser.branch] = branchStats[currentUser.branch];
+            }
+            branchStats = filteredStats;
+        }
 
         // Top KPIs
         kpiActive.textContent = overall.activeJobs;
@@ -76,7 +109,15 @@ window.initReports = function () {
 
     // === 3. Render Branch Table ===
     function renderBranchTable() {
-        const stats = window.ReportService.getBranchStats();
+        let stats = window.ReportService.getBranchStats();
+
+        // RBAC Filter
+        if (!isGlobalAdmin) {
+            const filtered = {};
+            if (stats[currentUser.branch]) filtered[currentUser.branch] = stats[currentUser.branch];
+            stats = filtered;
+        }
+
         branchTableBody.innerHTML = "";
 
         Object.keys(stats).forEach(branch => {
@@ -100,7 +141,13 @@ window.initReports = function () {
 
     // === 4. Render Activity Log ===
     function renderActivityLog() {
-        const logs = window.ReportService.getActivityLog();
+        let logs = window.ReportService.getActivityLog();
+
+        // RBAC Filter
+        if (!isGlobalAdmin) {
+            logs = logs.filter(l => l.branch === currentUser.branch);
+        }
+
         activityLogContainer.innerHTML = "";
 
         if (logs.length === 0) {

@@ -1,0 +1,64 @@
+<div class="h-16 flex items-center justify-center border-b border-gray-100">
+    <span class="text-xl font-bold text-red-600">RCI <span class="text-gray-800 font-medium">Staff</span></span>
+</div>
+
+<nav id="staff-nav" class="flex-1 p-4 space-y-2 overflow-y-auto">
+
+    <!-- Activities (Default for Everyone) -->
+    <button data-section="activities"
+        class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition">
+        <i class="fas fa-calendar-alt w-5 text-center"></i>
+        <span class="font-medium">Activities</span>
+    </button>
+
+    <!-- Overview (Manager Only) -->
+    <button data-section="overview" data-role="manager"
+        class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition hidden">
+        <i class="fas fa-chart-pie w-5 text-center"></i>
+        <span class="font-medium">Overview</span>
+    </button>
+
+    <!-- My Customers (Sales Only) -->
+    <button data-section="customers" data-role="sales"
+        class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition hidden">
+        <i class="fas fa-users w-5 text-center"></i>
+        <span class="font-medium">My Customers</span>
+    </button>
+
+    <!-- Requests / Queries (All except Driver sometimes? No, Driver might need it too) -->
+    <button data-section="requests"
+        class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition">
+        <i class="fas fa-envelope-open-text w-5 text-center"></i>
+        <span class="font-medium">Queries</span>
+    </button>
+
+    <!-- Logistics (Driver / Manager) -->
+    <button data-section="logistics" data-role="driver,manager"
+        class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition hidden">
+        <i class="fas fa-truck w-5 text-center"></i>
+        <span class="font-medium">Logistics</span>
+    </button>
+
+    <!-- Reports (Manager Only) -->
+    <button data-section="reports" data-role="manager"
+        class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition hidden">
+        <i class="fas fa-file-invoice w-5 text-center"></i>
+        <span class="font-medium">Reports</span>
+    </button>
+
+    <!-- Settings (Global - Limited) -->
+    <button data-section="settings"
+        class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition">
+        <i class="fas fa-cog w-5 text-center"></i>
+        <span class="font-medium">Settings</span>
+    </button>
+
+</nav>
+
+<div class="p-4 border-t border-gray-100">
+    <button id="logout-btn"
+        class="w-full flex items-center justify-center space-x-2 px-4 py-2 rounded-lg text-red-600 hover:bg-red-50 transition border border-red-100">
+        <i class="fas fa-sign-out-alt"></i>
+        <span>Logout</span>
+    </button>
+</div>

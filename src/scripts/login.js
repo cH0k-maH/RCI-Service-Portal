@@ -143,12 +143,18 @@ document.addEventListener("DOMContentLoaded", () => {
         if (result.success) {
           alert(`✅ Login successful! Welcome ${result.role}.`);
           // Redirect based on role
-          if (result.role === 'admin') {
-            window.location.href = "./src/pages/admin-dashboard/dashboard.html";
-          } else {
-            // If customer, maybe just close modal or redirect to portal
-            this.close();
-          }
+          // Dynamic Redirect based on Role Config
+          const specificRole = localStorage.getItem("staffType"); // e.g. "manager", "engineer"
+          const redirectUser = {
+            role: specificRole,
+            type: result.role // "staff", "admin", "customer"
+          };
+
+          const redirectUrl = window.UserService.getRedirectUrl(redirectUser);
+
+          setTimeout(() => {
+            window.location.href = redirectUrl;
+          }, 500); // Small delay for UX
         } else {
           alert(`❌ ${result.message}`);
         }

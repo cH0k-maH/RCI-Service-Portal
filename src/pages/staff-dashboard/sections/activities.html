@@ -1,0 +1,59 @@
+<div class="space-y-6">
+
+    <!-- Header / Controls -->
+    <div
+        class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-800">Weekly Schedule</h1>
+            <p class="text-sm text-gray-500">View and manage your assigned tasks</p>
+        </div>
+
+        <div class="flex items-center space-x-2">
+            <!-- Branch Indicator (Read Only for most) -->
+            <span class="px-3 py-1 bg-gray-100 text-gray-600 rounded-lg text-sm font-medium">
+                <i class="fas fa-map-marker-alt mr-1"></i>
+                <span id="activity-branch-display">Loading...</span>
+            </span>
+
+            <!-- Date Navigator -->
+            <div class="flex items-center bg-gray-50 rounded-lg border border-gray-200">
+                <button class="px-3 py-1 hover:bg-gray-200 rounded-l-lg text-gray-600"><i
+                        class="fas fa-chevron-left"></i></button>
+                <span class="px-4 py-1 font-medium text-gray-700 text-sm">Jan 22 - Jan 28</span>
+                <button class="px-3 py-1 hover:bg-gray-200 rounded-r-lg text-gray-600"><i
+                        class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Week Grid (Clickable) -->
+    <div class="grid grid-cols-5 gap-4" id="week-grid">
+        <!-- Populated by JS -->
+        <div
+            class="h-24 bg-white rounded-xl shadow-sm border border-gray-200 flex flex-col items-center justify-center animate-pulse">
+            <div class="h-4 w-12 bg-gray-200 rounded mb-2"></div>
+            <div class="h-6 w-8 bg-gray-200 rounded"></div>
+        </div>
+        <!-- ... Repeat x5 -->
+    </div>
+
+    <!-- Selected Day View -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
+            <h3 class="font-bold text-gray-800 flex items-center">
+                <span class="w-2 h-6 bg-red-600 rounded-full mr-3"></span>
+                Tasks for <span id="selected-day-label" class="ml-1">Today</span>
+            </h3>
+            <button class="text-sm text-red-600 font-medium hover:underline">+ Log Unplanned Activity</button>
+        </div>
+
+        <div id="tasks-container" class="p-6 space-y-4">
+            <!-- Empty State -->
+            <div class="text-center py-10 text-gray-400">
+                <i class="fas fa-clipboard-list text-4xl mb-3 opacity-50"></i>
+                <p>No tasks assigned for this day.</p>
+            </div>
+        </div>
+    </div>
+
+</div>

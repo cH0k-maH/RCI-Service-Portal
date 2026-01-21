@@ -18,22 +18,74 @@ class AuthService {
         // Simmons a network delay
         return new Promise((resolve) => {
             setTimeout(() => {
-                // TODO: Replace this with a real API call
-                // fetch('/api/login', { method: 'POST', ... })
-
+                // 1. HARDCODED MOCKS (For Quick Testing)
                 if (email === "admin@rci.com" && password === "admin123") {
-                    this.userRole = "admin";
-                    localStorage.setItem("userRole", "admin");
+                    this._setSession("admin", "Admin User", "admin", "Lagos");
                     resolve({ success: true, role: "admin" });
-                } else if (email === "user@rci.com" && password === "user123") {
-                    this.userRole = "customer";
-                    localStorage.setItem("userRole", "customer");
-                    resolve({ success: true, role: "customer" });
-                } else {
-                    resolve({ success: false, message: "Invalid email or password." });
+                    return;
                 }
+                if (email === "manager@rci.com" && password === "manager123") {
+                    this._setSession("staff", "Chioma Manager", "Manager", "Lagos");
+                    resolve({ success: true, role: "staff" });
+                    return;
+                }
+                if (email === "staff@rci.com" && password === "staff123") {
+                    this._setSession("staff", "Emeka Engineer", "Engineer", "Lagos");
+                    resolve({ success: true, role: "staff" });
+                    return;
+                }
+                if (email === "sales@rci.com" && password === "sales123") {
+                    this._setSession("staff", "Sarah Sales", "Sales", "Lagos");
+                    resolve({ success: true, role: "staff" });
+                    return;
+                }
+                if (email === "secretary@rci.com" && password === "sec123") {
+                    this._setSession("staff", "Bimbo Secretary", "Secretary", "Lagos");
+                    resolve({ success: true, role: "staff" });
+                    return;
+                }
+                if (email === "driver@rci.com" && password === "drive123") {
+                    this._setSession("staff", "Dan Driver", "Logistics", "Lagos");
+                    resolve({ success: true, role: "staff" });
+                    return;
+                }
+
+                // 2. CHECK DYNAMIC USERS (From Admin Creation)
+                // Note: In real app, this is API. Here we check localStorage "database".
+                // We assume a default password hierarchy or check against something stored.
+                // For prototype: If user exists in UserService and password is 'rci123', allow login.
+
+                const allUsers = window.UserService ? window.UserService.getAllUsers() : [];
+                const foundUser = allUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
+
+                if (foundUser) {
+                    // Simple password check for prototype
+                    if (password === "rci123") {
+                        const systemRole = foundUser.role === "Admin" ? "admin" :
+                            (foundUser.type === "staff" ? "staff" : "customer");
+
+                        this._setSession(
+                            systemRole,
+                            foundUser.name,
+                            foundUser.role, // e.g. "Engineer", "Sales"
+                            foundUser.branch || "Lagos"
+                        );
+                        resolve({ success: true, role: systemRole });
+                        return;
+                    }
+                }
+
+                resolve({ success: false, message: "Invalid email or password." });
             }, 800);
         });
+    }
+
+    _setSession(role, name, type, branch) {
+        this.userRole = role;
+        localStorage.setItem("userRole", role);
+        localStorage.setItem("userName", name);
+        localStorage.setItem("staffType", type.toLowerCase()); // engineer, sales, etc.
+        localStorage.setItem("branch", branch);
     }
 
     /**

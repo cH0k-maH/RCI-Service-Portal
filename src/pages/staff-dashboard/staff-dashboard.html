@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RCI Staff Dashboard</title>
+    <link href="../../styles/output.css" rel="stylesheet" />
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+
+<body class="bg-gray-100 text-gray-800">
+
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <aside id="sidebar-container" class="w-64 bg-white border-r border-gray-200 flex flex-col hidden md:flex">
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 flex flex-col overflow-hidden">
+            <!-- Topbar -->
+            <header id="topbar-container" class="shadow-sm bg-white z-10"></header>
+
+            <!-- Dashboard Section -->
+            <section id="dashboard-container" class="p-6 flex-1 overflow-y-auto bg-gray-50"></section>
+        </main>
+    </div>
+
+    <!-- Shared Services -->
+    <script src="../../scripts/lib/auth-service.js"></script>
+    <script src="../../scripts/lib/role-config.js"></script>
+    <script src="../../scripts/lib/user-service.js"></script>
+    <script src="../../scripts/lib/service-service.js"></script>
+    <script src="../../scripts/lib/request-service.js"></script>
+    <script src="../../scripts/lib/report-service.js"></script>
+    <script src="../../scripts/lib/settings-service.js"></script>
+
+    <!-- Dashboard Core -->
+    <script src="../../scripts/staff-dashboard/dashboard.js"></script>
+</body>
+
+</html>

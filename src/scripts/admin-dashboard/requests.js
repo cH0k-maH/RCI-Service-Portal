@@ -58,7 +58,24 @@ window.initRequests = function () {
     function renderTable() {
         const allRequests = window.RequestService.getAllRequests();
         const searchTerm = searchInput.value.toLowerCase();
-        const branchTerm = branchFilter.value;
+
+        // RBAC: Enforce Branch
+        const currentUser = {
+            role: localStorage.getItem("staffType"),
+            branch: localStorage.getItem("branch"),
+            isAdmin: window.AuthService.getRole() === 'admin'
+        };
+        const isGlobalAdmin = currentUser.isAdmin || (currentUser.role && currentUser.role.toUpperCase() === 'ADMIN');
+
+        let branchTerm = branchFilter.value;
+        if (!isGlobalAdmin) {
+            branchTerm = currentUser.branch;
+            if (branchFilter) {
+                branchFilter.value = branchTerm;
+                branchFilter.disabled = true;
+            }
+        }
+
         const typeTerm = typeFilter.value;
 
         const filtered = allRequests.filter(r => {

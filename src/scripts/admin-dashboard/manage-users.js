@@ -3,8 +3,21 @@
 window.initManageUsers = function () {
   console.log("Manage Users initialized (Advanced)");
 
-  // Check Auth
-  if (localStorage.getItem("userRole") !== "admin") return;
+  // Check Auth & Permissions
+  const currentUser = {
+    role: localStorage.getItem("staffType"),
+    branch: localStorage.getItem("branch")
+  };
+
+  // Allow if Admin OR has VIEW_ALL_USERS permission (Manager)
+  // Note: We use the helper from UserService or direct check if RoleConfig is reliable.
+  // Using UserService.can requires the full user object with 'role' property.
+  // currentUser here has 'role' = specific role (e.g. 'manager').
+
+  if (!window.UserService.can(currentUser, "view_all_users")) {
+    document.getElementById("dashboard-container").innerHTML = "<div class='p-10 text-red-600'>Access Denied.</div>";
+    return;
+  }
 
   // === UI Elements ===
   const tableBody = document.getElementById("users-table-body");
@@ -33,7 +46,6 @@ window.initManageUsers = function () {
     // Common
     status: document.getElementById("common-status"),
     notes: document.getElementById("common-notes"),
-    notes: document.getElementById("common-notes"),
     // Staff
     staffName: document.getElementById("staff-name"),
     staffEmail: document.getElementById("staff-email"),
@@ -54,6 +66,10 @@ window.initManageUsers = function () {
     customerEmail: document.getElementById("customer-email"),
     customerType: document.getElementById("customer-type"),
   };
+
+  // === Permission Helpers ===
+  const isGlobalAdmin = window.AuthService.getRole() === "admin" || currentUser.role.toUpperCase() === "ADMIN";
+  const userBranch = currentUser.branch;
 
   // === UI Logic: Dynamic Form Switching ===
   function updateFormVisibility() {
@@ -81,14 +97,28 @@ window.initManageUsers = function () {
       data.name = inputs.staffName.value;
       data.email = inputs.staffEmail.value;
       data.role = inputs.staffRole.value; // Admin, Engineer, etc.
-      data.branch = inputs.staffBranch.value;
+
+      // Enforce Branch for Managers
+      if (!isGlobalAdmin) {
+        data.branch = userBranch;
+      } else {
+        data.branch = inputs.staffBranch.value;
+      }
+
       data.secondaryInfo = argsOrEmpty(inputs.staffPhone.value);
       data.displayRole = data.role; // For the badge
     } else if (type === "dealer") {
       data.name = inputs.dealerCompany.value; // Use Company as main name
       data.contactPerson = inputs.dealerContact.value;
       data.email = inputs.dealerEmail.value;
-      data.branch = inputs.dealerBranch.value;
+
+      // Enforce Branch
+      if (!isGlobalAdmin) {
+        data.branch = userBranch;
+      } else {
+        data.branch = inputs.dealerBranch.value;
+      }
+
       data.role = "Dealer";
       data.displayRole = inputs.dealerServiceType.value; // e.g., Sales Partner
       data.secondaryInfo = data.contactPerson;
@@ -96,7 +126,14 @@ window.initManageUsers = function () {
       data.name = inputs.customerCompany.value;
       data.contactPerson = inputs.customerContact.value;
       data.email = inputs.customerEmail.value;
-      data.branch = inputs.customerBranch.value;
+
+      // Enforce Branch
+      if (!isGlobalAdmin) {
+        data.branch = userBranch;
+      } else {
+        data.branch = inputs.customerBranch.value;
+      }
+
       data.role = "Customer";
       data.displayRole = inputs.customerType.value; // Corporate / Individual
       data.secondaryInfo = data.contactPerson;
@@ -115,6 +152,11 @@ window.initManageUsers = function () {
     const branchTerm = branchFilter.value;
 
     const filteredUsers = users.filter(user => {
+      // 1. Branch Restriction (RBAC)
+      if (!isGlobalAdmin) {
+        if (user.branch !== userBranch) return false;
+      }
+
       // Safe check for properties since data structure varies slightly
       const name = (user.name || "").toLowerCase();
       const email = (user.email || "").toLowerCase();
@@ -149,8 +191,6 @@ window.initManageUsers = function () {
         if (user.type === 'customer') icon = "fa-building";
 
         // Role Badge (Standardized logic)
-        // If it's internal staff, show their specific role (Engineer). 
-        // If dealer/customer, show their subtype (Sales Partner, Corporate)
         let displayBadge = user.displayRole || user.role || "User";
         let badgeClass = "bg-gray-100 text-gray-600";
         if (displayBadge === 'Admin') badgeClass = "bg-red-100 text-red-700";
@@ -199,6 +239,31 @@ window.initManageUsers = function () {
     modalOverlay.classList.remove("hidden");
     updateFormVisibility(); // Reset to current selector state
 
+    // RBAC: Hide "Admin" option from Role Selector if not global admin
+    const roleSelect = inputs.staffRole;
+    if (roleSelect) {
+      // Assuming options exist. Rebuild options? Or just hide Admin.
+      // Let's assume there is an option with value="Admin".
+      for (let i = 0; i < roleSelect.options.length; i++) {
+        if (roleSelect.options[i].value === 'Admin') {
+          if (!isGlobalAdmin) roleSelect.options[i].style.display = "none";
+          else roleSelect.options[i].style.display = "block";
+        }
+      }
+    }
+
+    // RBAC: Lock Branch Selection for Manager
+    if (!isGlobalAdmin) {
+      // Disable or hide branch selectors and auto-set
+      if (inputs.staffBranch) { inputs.staffBranch.value = userBranch; inputs.staffBranch.disabled = true; }
+      if (inputs.dealerBranch) { inputs.dealerBranch.value = userBranch; inputs.dealerBranch.disabled = true; }
+      if (inputs.customerBranch) { inputs.customerBranch.value = userBranch; inputs.customerBranch.disabled = true; }
+    } else {
+      if (inputs.staffBranch) inputs.staffBranch.disabled = false;
+      if (inputs.dealerBranch) inputs.dealerBranch.disabled = false;
+      if (inputs.customerBranch) inputs.customerBranch.disabled = false;
+    }
+
     if (isEdit && userData) {
       modalTitle.textContent = "Edit User";
       accountTypeSelector.value = userData.type || "staff";
@@ -237,6 +302,13 @@ window.initManageUsers = function () {
       accountTypeSelector.value = "staff"; // Default
       updateFormVisibility();
       inputs.id.value = "";
+
+      // RBAC: Auto-set branch again (reset clears it)
+      if (!isGlobalAdmin) {
+        if (inputs.staffBranch) inputs.staffBranch.value = userBranch;
+        if (inputs.dealerBranch) inputs.dealerBranch.value = userBranch;
+        if (inputs.customerBranch) inputs.customerBranch.value = userBranch;
+      }
     }
   }
 
