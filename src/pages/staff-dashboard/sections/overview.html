@@ -1,0 +1,188 @@
+<!-- OVERVIEW DASHBOARD (STAFF VERSION) -->
+
+<div class="space-y-8 animate-fadeIn">
+
+    <!-- KPI CARDS (Personal Context) -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- My Pending Tasks -->
+        <div class="kpi-card-staff bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-4 hover:shadow-lg transition cursor-pointer"
+            data-target="tasks">
+            <div class="w-12 h-12 bg-red-50 text-red-600 rounded-2xl flex items-center justify-center text-2xl">
+                <i class="fas fa-tasks"></i>
+            </div>
+            <div>
+                <h4 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">My Tasks</h4>
+                <p class="text-2xl font-black text-gray-800" id="ov-pending-tasks">0</p>
+            </div>
+        </div>
+
+        <!-- My Recent Uploads -->
+        <div class="kpi-card-staff bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-4 hover:shadow-lg transition cursor-pointer"
+            data-target="sales-uploads">
+            <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-2xl">
+                <i class="fas fa-file-upload"></i>
+            </div>
+            <div>
+                <h4 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">Uploads</h4>
+                <p class="text-2xl font-black text-gray-800" id="ov-my-uploads">0</p>
+            </div>
+        </div>
+
+        <!-- Branch Jobs -->
+        <div class="kpi-card-staff bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-4 hover:shadow-lg transition cursor-pointer"
+            data-target="jobs">
+            <div class="w-12 h-12 bg-orange-50 text-orange-600 rounded-2xl flex items-center justify-center text-2xl">
+                <i class="fas fa-tools"></i>
+            </div>
+            <div>
+                <h4 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">Branch Jobs</h4>
+                <p class="text-2xl font-black text-gray-800" id="ov-active-services">0</p>
+            </div>
+        </div>
+
+        <!-- Quick Alerts -->
+        <div class="kpi-card-staff bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-4 hover:shadow-lg transition cursor-pointer"
+            data-target="requests">
+            <div class="w-12 h-12 bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center text-2xl">
+                <i class="fas fa-bell"></i>
+            </div>
+            <div>
+                <h4 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">Alerts</h4>
+                <p class="text-2xl font-black text-gray-800" id="ov-alerts">0</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- TABLE CONTROLS -->
+    <div
+        class="flex flex-wrap items-center justify-between gap-4 bg-white p-4 rounded-3xl shadow-sm border border-gray-100">
+        <div class="flex items-center gap-4">
+            <h3 class="font-black text-gray-800 uppercase tracking-tighter text-lg">Weekly Movement</h3>
+            <span id="branch-badge"
+                class="px-3 py-1 bg-red-50 text-red-600 rounded-full text-[10px] font-black uppercase tracking-widest">Lagos
+                Branch</span>
+        </div>
+
+        <div class="flex bg-gray-50 p-1 rounded-2xl">
+            <button id="weeklyBtn"
+                class="px-6 py-2 text-xs font-bold rounded-xl bg-red-600 text-white shadow-sm transition">Weekly</button>
+            <button id="monthlyBtn"
+                class="px-6 py-2 text-xs font-bold rounded-xl text-gray-500 hover:bg-gray-100 transition">Monthly</button>
+        </div>
+    </div>
+
+    <!-- WEEKLY MOVEMENT TABLE -->
+    <section id="weeklyTable" class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead
+                    class="bg-gray-50 text-[10px] uppercase font-black tracking-widest text-gray-400 border-b border-gray-100">
+                    <tr>
+                        <th class="p-6">Day</th>
+                        <th class="p-6">Axis / Area</th>
+                        <th class="p-6">Sales Activity</th>
+                        <th class="p-6">Technical Activity</th>
+                        <th class="p-6">Personnel</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-50">
+                    <tr class="hover:bg-gray-50 transition cursor-pointer group">
+                        <td class="p-6 font-black text-gray-800">Monday</td>
+                        <td class="p-6 text-sm text-gray-500 font-medium italic">Lekki / Ajah Axis</td>
+                        <td class="p-6"><span class="bg-blue-50 text-blue-700 px-3 py-1 rounded-lg text-xs font-bold">3
+                                Visits</span></td>
+                        <td class="p-6"><span
+                                class="bg-orange-50 text-orange-700 px-3 py-1 rounded-lg text-xs font-bold">2
+                                Jobs</span></td>
+                        <td class="p-6 text-xs text-gray-400">Sarah, John, Mike</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50 transition cursor-pointer">
+                        <td class="p-6 font-black text-gray-800">Tuesday</td>
+                        <td class="p-6 text-sm text-gray-500 font-medium italic">Ikeja / Gbagada</td>
+                        <td class="p-6"><span class="bg-blue-50 text-blue-700 px-3 py-1 rounded-lg text-xs font-bold">5
+                                Visits</span></td>
+                        <td class="p-6"><span
+                                class="bg-orange-50 text-orange-700 px-3 py-1 rounded-lg text-xs font-bold">4
+                                Jobs</span></td>
+                        <td class="p-6 text-xs text-gray-400">Sarah, Peter, Paul</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50 transition cursor-pointer">
+                        <td class="p-6 font-black text-gray-800">Wednesday</td>
+                        <td class="p-6 text-sm text-gray-500 font-medium italic">Victoria Island</td>
+                        <td class="p-6"><span class="bg-blue-50 text-blue-700 px-3 py-1 rounded-lg text-xs font-bold">4
+                                Visits</span></td>
+                        <td class="p-6"><span
+                                class="bg-orange-50 text-orange-700 px-3 py-1 rounded-lg text-xs font-bold">1 Job</span>
+                        </td>
+                        <td class="p-6 text-xs text-gray-400">Mike, John</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50 transition cursor-pointer">
+                        <td class="p-6 font-black text-gray-800">Thursday</td>
+                        <td class="p-6 text-sm text-gray-500 font-medium italic">Apapa / Surulere</td>
+                        <td class="p-6 text-xs text-gray-300">--</td>
+                        <td class="p-6"><span
+                                class="bg-orange-50 text-orange-700 px-3 py-1 rounded-lg text-xs font-bold">6
+                                Jobs</span></td>
+                        <td class="p-6 text-xs text-gray-400">Emmanuel, Peter</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50 transition cursor-pointer">
+                        <td class="p-6 font-black text-gray-800">Friday</td>
+                        <td class="p-6 text-sm text-gray-500 font-medium italic">Office Day</td>
+                        <td class="p-6 font-bold text-gray-400">Reviews</td>
+                        <td class="p-6 font-bold text-gray-400">Maintenance</td>
+                        <td class="p-6 text-xs text-gray-400">All Staff</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- MONTHLY CALENDAR (Aligned with Admin) -->
+    <div id="monthlyTable"
+        class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 hidden flex-col animate-fadeIn">
+        <div class="flex justify-between items-center mb-8">
+            <div>
+                <h3 class="text-2xl font-black text-gray-800 uppercase tracking-tighter" id="calendarTitle">Month Year
+                </h3>
+                <p class="text-xs text-gray-400 font-bold uppercase tracking-widest mt-1">Activity Matrix View</p>
+            </div>
+            <div class="flex items-center gap-6">
+                <!-- Navigation -->
+                <div class="flex bg-gray-50 p-1 rounded-2xl">
+                    <button id="prevMonth"
+                        class="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-white hover:shadow-sm transition text-gray-400 hover:text-red-600">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button id="nextMonth"
+                        class="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-white hover:shadow-sm transition text-gray-400 hover:text-red-600">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+                <!-- Legend -->
+                <div class="flex items-center gap-4 text-[10px] font-black uppercase tracking-widest text-gray-400">
+                    <span class="flex items-center gap-2">
+                        <div class="w-2 h-2 bg-blue-500 rounded-full"></div> Service
+                    </span>
+                    <span class="flex items-center gap-2">
+                        <div class="w-2 h-2 bg-red-500 rounded-full"></div> Request
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Calendar Grid -->
+        <div class="grid grid-cols-7 mb-4 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest">
+            <div>Sun</div>
+            <div>Mon</div>
+            <div>Tue</div>
+            <div>Wed</div>
+            <div>Thu</div>
+            <div>Fri</div>
+            <div>Sat</div>
+        </div>
+        <div id="calendar-grid" class="grid grid-cols-7 gap-3">
+            <!-- JS populated -->
+        </div>
+    </div>
+
+</div>

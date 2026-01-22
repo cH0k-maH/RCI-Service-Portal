@@ -1,0 +1,49 @@
+<!-- ASSIGNED TRIPS (DRIVER) -->
+<div class="space-y-6 animate-fadeIn">
+    <div class="flex items-center justify-between">
+        <div>
+            <h2 class="text-2xl font-black text-gray-800 uppercase tracking-tighter">Assigned Trips</h2>
+            <p class="text-sm text-gray-500 font-medium">Manage your daily movements and proof of delivery.</p>
+        </div>
+        <div class="px-4 py-2 bg-blue-50 text-blue-600 rounded-2xl text-xs font-black uppercase tracking-widest">
+            <i class="fas fa-route mr-2"></i> Today's Schedule
+        </div>
+    </div>
+
+    <!-- TRIPS GRID -->
+    <div id="trips-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Rendered via JS -->
+    </div>
+
+    <!-- COMMON UPLOAD MODAL (Reusing or Custom) -->
+    <div id="trip-upload-modal"
+        class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-3xl w-full max-w-md p-8 shadow-2xl transform transition-all scale-95 opacity-0"
+            id="trip-modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-black text-gray-800 uppercase tracking-tighter" id="trip-modal-title">Upload
+                    Proof</h3>
+                <button onclick="closeTripModal()"
+                    class="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-gray-100 transition text-gray-400">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <form id="trip-upload-form" class="space-y-4">
+                <div
+                    class="p-6 border-2 border-dashed border-gray-100 rounded-3xl text-center hover:border-red-200 transition cursor-pointer group">
+                    <i
+                        class="fas fa-cloud-upload-alt text-4xl text-gray-200 group-hover:text-red-300 mb-4 transition"></i>
+                    <p class="text-sm font-bold text-gray-400">Click to upload Waybill or Photo</p>
+                    <input type="file" class="hidden" id="trip-file">
+                </div>
+                <textarea
+                    class="w-full p-4 bg-gray-50 rounded-2xl border-none focus:ring-2 focus:ring-red-100 text-sm font-medium"
+                    placeholder="Add notes (e.g. delivered to gate, client signed)"></textarea>
+                <button type="submit"
+                    class="w-full bg-red-600 text-white py-4 rounded-2xl font-black uppercase tracking-widest shadow-lg shadow-red-200 hover:bg-red-700 transition">Complete
+                    Trip</button>
+            </form>
+        </div>
+    </div>
+</div>

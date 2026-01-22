@@ -76,14 +76,22 @@ window.initServices = function () {
 
     // === 2. KPI Logic ===
     function updateKpiCards() {
-        const stats = window.ServiceService.getStats();
-        // Note: getStats might return global totals. 
-        // For strict correctness, we should re-calc stats based on filtered services if manager.
-        // We'll trust the filtered table for main view, but KPI cards might be misleading if global.
-        // Let's rely on renderTable for view. Fixing KPIs is nice-to-have but UI text update is manual here.
-        // FIXME: Update stats locally if not admin.
+        const allServices = window.ServiceService.getAllServices();
+        let displayServices = allServices;
 
-        document.getElementById("kpi-total").textContent = stats.total; // Potentially incorrect for Manager
+        // RBAC: Filter for Branch Manager
+        if (!isGlobalAdmin) {
+            displayServices = allServices.filter(s => s.branch === currentUser.branch);
+        }
+
+        const stats = {
+            total: displayServices.length,
+            active: displayServices.filter(s => s.status === 'Active').length,
+            pending: displayServices.filter(s => s.status === 'Pending').length,
+            completed: displayServices.filter(s => s.status === 'Completed').length
+        };
+
+        document.getElementById("kpi-total").textContent = stats.total;
         document.getElementById("kpi-active").textContent = stats.active;
         document.getElementById("kpi-pending").textContent = stats.pending;
         document.getElementById("kpi-completed").textContent = stats.completed;
@@ -113,7 +121,7 @@ window.initServices = function () {
             branchTerm = currentUser.branch;
             if (branchFilter) {
                 branchFilter.value = branchTerm;
-                branchFilter.disabled = true;
+                branchFilter.style.display = "none"; // Total removal from view
             }
         }
 
@@ -228,7 +236,7 @@ window.initServices = function () {
         // RBAC: Lock Branch Input
         if (!isGlobalAdmin) {
             inputBranch.value = currentUser.branch;
-            inputBranch.disabled = true;
+            inputBranch.parentElement.style.display = "none"; // Remove from modal view
         } else {
             inputBranch.disabled = false;
         }

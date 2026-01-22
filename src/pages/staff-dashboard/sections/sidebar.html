@@ -1,64 +1,129 @@
-<div class="h-16 flex items-center justify-center border-b border-gray-100">
-    <span class="text-xl font-bold text-red-600">RCI <span class="text-gray-800 font-medium">Staff</span></span>
-</div>
+<!-- Sidebar Container -->
+<div class="flex flex-col h-full bg-white">
+    <!-- Logo Section -->
+    <div class="h-16 flex items-center justify-center border-b border-gray-200">
+        <h1 class="text-xl font-bold text-red-600">RCI Staff</h1>
+    </div>
 
-<nav id="staff-nav" class="flex-1 p-4 space-y-2 overflow-y-auto">
+    <!-- Navigation Section -->
+    <nav id="staff-nav" class="flex-1 px-4 py-6 space-y-2 overflow-y-auto overflow-x-hidden">
 
-    <!-- Activities (Default for Everyone) -->
-    <button data-section="activities"
-        class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition">
-        <i class="fas fa-calendar-alt w-5 text-center"></i>
-        <span class="font-medium">Activities</span>
-    </button>
+        <!-- Home Sections -->
+        <button data-section="overview"
+            class="flex items-center w-full px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 font-semibold transition group">
+            <i class="fas fa-chart-line mr-2 w-5 text-center"></i>
+            <span>Dashboard</span>
+        </button>
 
-    <!-- Overview (Manager Only) -->
-    <button data-section="overview" data-role="manager"
-        class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition hidden">
-        <i class="fas fa-chart-pie w-5 text-center"></i>
-        <span class="font-medium">Overview</span>
-    </button>
+        <button data-section="activities"
+            class="flex items-center w-full px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 font-semibold transition group">
+            <i class="fas fa-bolt mr-2 w-5 text-center"></i>
+            <span>Action Hub</span>
+        </button>
 
-    <!-- My Customers (Sales Only) -->
-    <button data-section="customers" data-role="sales"
-        class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition hidden">
-        <i class="fas fa-users w-5 text-center"></i>
-        <span class="font-medium">My Customers</span>
-    </button>
+        <!-- Role Specific (Grouped subtly) -->
+        <div data-role="sales" class="hidden h-4"></div>
+        <button data-section="customers" data-role="sales"
+            class="flex items-center w-full px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 font-semibold transition hidden group">
+            <i class="fas fa-user-tie mr-2 w-5 text-center"></i>
+            <span>My Customers</span>
+        </button>
+        <button data-section="sales-uploads" data-role="sales"
+            class="flex items-center w-full px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 font-semibold transition hidden group">
+            <i class="fas fa-file-upload mr-2 w-5 text-center"></i>
+            <span>Sales Uploads</span>
+        </button>
 
-    <!-- Requests / Queries (All except Driver sometimes? No, Driver might need it too) -->
-    <button data-section="requests"
-        class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition">
-        <i class="fas fa-envelope-open-text w-5 text-center"></i>
-        <span class="font-medium">Queries</span>
-    </button>
+        <div data-role="engineer" class="hidden h-4"></div>
+        <button data-section="jobs" data-role="engineer"
+            class="flex items-center w-full px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 font-semibold transition hidden group">
+            <i class="fas fa-tools mr-2 w-5 text-center"></i>
+            <span>Assigned Jobs</span>
+        </button>
+        <button data-section="job-uploads" data-role="engineer"
+            class="flex items-center w-full px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 font-semibold transition hidden group">
+            <i class="fas fa-clipboard-check mr-2 w-5 text-center"></i>
+            <span>Job Uploads</span>
+        </button>
+        <button data-section="parts" data-role="engineer"
+            class="flex items-center w-full px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 font-semibold transition hidden group">
+            <i class="fas fa-box-open mr-2 w-5 text-center"></i>
+            <span>Parts & Recs</span>
+        </button>
 
-    <!-- Logistics (Driver / Manager) -->
-    <button data-section="logistics" data-role="driver,manager"
-        class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition hidden">
-        <i class="fas fa-truck w-5 text-center"></i>
-        <span class="font-medium">Logistics</span>
-    </button>
+        <!-- Logistics (Driver / Logistics Staff) -->
+        <div data-role="driver" class="hidden h-4"></div>
+        <button data-section="trips" data-role="driver"
+            class="flex items-center w-full px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 font-semibold transition hidden group">
+            <i class="fas fa-route mr-2 w-5 text-center"></i>
+            <span>Assigned Trips</span>
+        </button>
+        <button data-section="fuel" data-role="driver"
+            class="flex items-center w-full px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 font-semibold transition hidden group">
+            <i class="fas fa-gas-pump mr-2 w-5 text-center"></i>
+            <span>Fuel & Vehicle</span>
+        </button>
+        <button data-section="logistics-docs" data-role="driver"
+            class="flex items-center w-full px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 font-semibold transition hidden group">
+            <i class="fas fa-file-invoice mr-2 w-5 text-center"></i>
+            <span>Logistics Docs</span>
+        </button>
 
-    <!-- Reports (Manager Only) -->
-    <button data-section="reports" data-role="manager"
-        class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition hidden">
-        <i class="fas fa-file-invoice w-5 text-center"></i>
-        <span class="font-medium">Reports</span>
-    </button>
+        <!-- Management Support (Secretary) -->
+        <div data-role="secretary" class="hidden h-4"></div>
+        <button data-section="activities-editor" data-role="secretary"
+            class="flex items-center w-full px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 font-semibold transition hidden group">
+            <i class="fas fa-edit mr-2 w-5 text-center"></i>
+            <span>Activities Editor</span>
+        </button>
+        <button data-section="upload-review" data-role="secretary"
+            class="flex items-center w-full px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 font-semibold transition hidden group">
+            <i class="fas fa-check-double mr-2 w-5 text-center"></i>
+            <span>Upload Review</span>
+        </button>
+        <button data-section="reports-prep" data-role="secretary"
+            class="flex items-center w-full px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 font-semibold transition hidden group">
+            <i class="fas fa-file-signature mr-2 w-5 text-center"></i>
+            <span>Reports Prep</span>
+        </button>
 
-    <!-- Settings (Global - Limited) -->
-    <button data-section="settings"
-        class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition">
-        <i class="fas fa-cog w-5 text-center"></i>
-        <span class="font-medium">Settings</span>
-    </button>
+        <!-- Logistics (Manager Grouping - Legacy) -->
+        <div data-role="manager" class="hidden h-4"></div>
+        <button data-section="logistics" data-role="manager"
+            class="flex items-center w-full px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 font-semibold transition hidden group">
+            <i class="fas fa-truck mr-2 w-5 text-center"></i>
+            <span>Branch Logistics</span>
+        </button>
 
-</nav>
+        <!-- System -->
+        <div class="h-4"></div>
+        <button data-section="tasks"
+            class="flex items-center w-full px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 font-semibold transition group">
+            <i class="fas fa-tasks mr-2 w-5 text-center"></i>
+            <span>My Tasks</span>
+        </button>
+        <button data-section="requests"
+            class="flex items-center w-full px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 font-semibold transition group">
+            <i class="fas fa-comment-dots mr-2 w-5 text-center"></i>
+            <span>Queries</span>
+        </button>
 
-<div class="p-4 border-t border-gray-100">
-    <button id="logout-btn"
-        class="w-full flex items-center justify-center space-x-2 px-4 py-2 rounded-lg text-red-600 hover:bg-red-50 transition border border-red-100">
-        <i class="fas fa-sign-out-alt"></i>
-        <span>Logout</span>
-    </button>
+        <!-- Analytics -->
+        <div data-role="manager" class="hidden h-4"></div>
+        <button data-section="reports" data-role="manager"
+            class="flex items-center w-full px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 font-semibold transition hidden group">
+            <i class="fas fa-chart-pie mr-2 w-5 text-center"></i>
+            <span>Reports</span>
+        </button>
+
+    </nav>
+
+    <!-- Logout Section -->
+    <div class="p-4 border-t border-gray-200 mt-auto">
+        <button id="logout-btn"
+            class="w-full bg-red-600 text-white py-2 rounded-lg hover:bg-red-700 shadow-md transition transform active:scale-95 font-bold flex items-center justify-center">
+            <i class="fas fa-sign-out-alt mr-2"></i>
+            <span>Logout</span>
+        </button>
+    </div>
 </div>

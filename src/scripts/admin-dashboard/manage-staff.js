@@ -23,6 +23,8 @@ window.initManageStaff = function () {
     const noUsersMsg = document.getElementById("no-users-msg");
     const searchInput = document.getElementById("user-search");
     const branchFilter = document.getElementById("branch-filter");
+    const deptFilter = document.getElementById("dept-filter");
+    const statusFilter = document.getElementById("status-filter");
 
     // Modal Elements
     const modalOverlay = document.getElementById("user-modal-overlay");
@@ -31,6 +33,22 @@ window.initManageStaff = function () {
     const addUserBtn = document.getElementById("addUserBtn");
     const closeBtn = document.getElementById("close-user-modal");
     const cancelBtn = document.getElementById("cancel-user-modal");
+
+    // Action Modal Elements
+    const actionModalOverlay = document.getElementById("staff-action-modal-overlay");
+    const actionStaffName = document.getElementById("action-staff-name");
+    const actionStaffRole = document.getElementById("action-staff-role");
+    const closeActionModalBtn = document.getElementById("close-action-modal");
+
+    const btnAssignTask = document.getElementById("btn-assign-task");
+    const btnReviewReports = document.getElementById("btn-review-reports");
+    const btnIssueQuery = document.getElementById("btn-issue-query");
+    const btnEditProfile = document.getElementById("btn-edit-staff-profile");
+
+    // Admin-Only: Add Staff Button
+    if (addUserBtn && !isGlobalAdmin) {
+        addUserBtn.style.display = 'none';
+    }
 
     // Hide Type Selector if it exists in HTML (we are hardcoding Staff)
     const accountTypeSelector = document.getElementById("account-type-selector");
@@ -57,7 +75,9 @@ window.initManageStaff = function () {
         staffPhone: document.getElementById("staff-phone"),
         staffRole: document.getElementById("staff-role"),
         staffBranch: document.getElementById("staff-branch"),
-        staffId: document.getElementById("staff-id")
+        staffId: document.getElementById("staff-id"),
+        staffPicture: document.getElementById("staff-picture"),
+        staffDropbox: document.getElementById("staff-dropbox")
     };
 
     // === Render Function ===
@@ -67,31 +87,41 @@ window.initManageStaff = function () {
         // Filter for STAFF only
         users = users.filter(u => u.type !== 'customer' && u.type !== 'dealer');
 
-        // Filter
+        // Filters
         const searchTerm = searchInput.value.toLowerCase();
+        const deptTerm = deptFilter ? deptFilter.value : "";
+        const statusTerm = statusFilter ? statusFilter.value : "";
 
         // Enforce Branch
-        let branchTerm = branchFilter.value;
+        let branchTerm = branchFilter ? branchFilter.value : "";
         if (!isGlobalAdmin) {
             branchTerm = currentUser.branch;
             if (branchFilter) {
                 branchFilter.value = branchTerm;
-                // User requested removal from view
                 branchFilter.style.display = "none";
-                branchFilter.disabled = true;
+                branchFilter.parentElement.style.display = "none"; // Hide the parent label/container too
             }
+        } else {
+            // Admin can see the filter
+            if (branchFilter) branchFilter.classList.remove("hidden");
         }
 
         const filteredUsers = users.filter(user => {
             // 1. Branch Restriction
             if (branchTerm && user.branch !== branchTerm) return false;
 
-            // Safe check
+            // 2. Department/Role Filter
+            if (deptTerm && user.role !== deptTerm) {
+                if (!(deptTerm === 'Logistics' && user.role === 'Driver')) return false;
+            }
+
+            // 3. Status Filter
+            if (statusTerm && user.status !== statusTerm) return false;
+
+            // 4. Search
             const name = (user.name || "").toLowerCase();
             const email = (user.email || "").toLowerCase();
-
-            const matchesSearch = name.includes(searchTerm) || email.includes(searchTerm);
-            return matchesSearch;
+            return name.includes(searchTerm) || email.includes(searchTerm);
         });
 
         tableBody.innerHTML = "";
@@ -104,49 +134,58 @@ window.initManageStaff = function () {
 
             filteredUsers.forEach(user => {
                 const tr = document.createElement("tr");
-                tr.className = "hover:bg-gray-50 transition";
+                tr.className = "hover:bg-red-50 transition border-b cursor-pointer group"; // Added cursor-pointer
 
-                // Status Styles
-                const statusLower = (user.status || "Active").toLowerCase();
+                // Row Click opens Action Modal
+                tr.onclick = (e) => {
+                    if (e.target.closest("button")) return; // Don't trigger if clicking explicit buttons
+                    openActionModal(user);
+                };
+
+                // Status Badge
+                const statusStr = user.status || "Active";
                 let statusClass = "bg-green-100 text-green-800";
-                if (statusLower !== "active") statusClass = "bg-gray-100 text-gray-800";
+                if (statusStr === "On Leave") statusClass = "bg-yellow-100 text-yellow-800";
+                if (statusStr === "Suspended") statusClass = "bg-red-100 text-red-800";
 
-                // Role Badge
-                let displayBadge = user.role || "Staff";
-                let badgeClass = "bg-blue-100 text-blue-700";
-                if (displayBadge === 'Admin') badgeClass = "bg-red-100 text-red-700";
+                // Simulated Module Data
+                const taskCount = Math.floor(Math.random() * 5);
+                const reportCount = Math.floor(Math.random() * 3);
+                const lastActivity = "Today, 10:45 AM";
 
                 tr.innerHTML = `
                 <td class="px-6 py-4 whitespace-nowrap">
                    <div class="flex items-center">
-                      <div class="flex-shrink-0 h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 mr-3">
+                      <div class="flex-shrink-0 h-10 w-10 rounded-full bg-red-50 flex items-center justify-center text-red-600 mr-3 border border-red-100">
                         <i class="fas fa-id-badge"></i>
                       </div>
                       <div>
                         <div class="text-sm font-bold text-gray-900">${user.name}</div>
-                        <div class="text-xs text-gray-500">${user.role}</div>
+                        <div class="text-xs text-gray-500 font-medium">${user.role}</div>
                       </div>
                    </div>
                 </td>
-                 <td class="px-6 py-4 whitespace-nowrap">
-                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${badgeClass}">
-                        ${displayBadge}
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="px-2.5 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass}">
+                        ${statusStr}
                     </span>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                   <div class="text-sm text-gray-900">${user.email}</div>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                   <div class="flex items-center">
+                      <span class="font-bold mr-1">${taskCount}</span> Tasks
+                   </div>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${user.branch || '-'}</td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass}">
-                        ${user.status || 'Active'}
-                    </span>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 font-medium">
+                    ${reportCount > 0 ? `<span class="text-red-600 font-bold">${reportCount} Pending</span>` : `<span class="text-green-600 italic">None</span>`}
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium space-x-3">
-                    <button class="text-blue-600 hover:text-blue-900 edit-btn" data-id="${user.id}" title="Edit Profile"><i class="fas fa-edit"></i></button>
-                    ${!isGlobalAdmin ?
-                        `<button class="text-purple-600 hover:text-purple-900 task-btn" data-id="${user.id}" title="Assign Task"><i class="fas fa-tasks"></i></button>`
-                        : ''}
+                <td class="px-6 py-4 whitespace-nowrap text-xs text-gray-500 italic">
+                   ${lastActivity}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium space-x-2">
+                    <button class="text-blue-600 hover:text-blue-900 edit-btn bg-blue-50 p-2 rounded shadow-sm" data-id="${user.id}" title="Edit Profile"><i class="fas fa-user-edit"></i></button>
+                    <button class="text-purple-600 hover:text-purple-900 task-btn bg-purple-50 p-2 rounded shadow-sm" data-id="${user.id}" title="Assign Task"><i class="fas fa-tasks"></i></button>
+                    <button class="text-orange-600 hover:text-orange-900 report-btn bg-orange-50 p-2 rounded shadow-sm" data-id="${user.id}" title="Review Reports"><i class="fas fa-file-signature"></i></button>
+                    <button class="text-red-600 hover:text-red-900 query-btn bg-red-50 p-2 rounded shadow-sm" data-id="${user.id}" title="Issue Query"><i class="fas fa-question-circle"></i></button>
                 </td>
             `;
                 tableBody.appendChild(tr);
@@ -179,6 +218,38 @@ window.initManageStaff = function () {
             if (inputs.staffBranch) inputs.staffBranch.disabled = false;
         }
 
+        // --- Role-Based Field Access ---
+        // If editing and NOT a Global Admin, restrict fields
+        const isRestrictedEdit = isEdit && !isGlobalAdmin;
+
+        // Fields to restrict
+        const restrictedFields = [
+            inputs.staffName,
+            inputs.staffEmail,
+            inputs.staffPhone,
+            inputs.staffId,
+            inputs.staffRole,
+            inputs.staffBranch,
+            inputs.staffPicture,
+            inputs.staffDropbox
+        ];
+
+        restrictedFields.forEach(field => {
+            if (field) {
+                field.disabled = isRestrictedEdit;
+                // Add a visual cue for disabled fields
+                if (isRestrictedEdit) {
+                    field.classList.add("bg-gray-100", "cursor-not-allowed");
+                } else {
+                    field.classList.remove("bg-gray-100", "cursor-not-allowed");
+                }
+            }
+        });
+
+        // Always ensure Status and Notes are enabled
+        if (inputs.status) inputs.status.disabled = false;
+        if (inputs.notes) inputs.notes.disabled = false;
+
         if (isEdit && userData) {
             modalTitle.textContent = "Edit Staff";
             inputs.id.value = userData.id;
@@ -189,6 +260,8 @@ window.initManageStaff = function () {
             inputs.staffRole.value = userData.role;
             inputs.staffBranch.value = userData.branch;
             inputs.staffPhone.value = userData.secondaryInfo;
+            if (inputs.staffDropbox) inputs.staffDropbox.value = userData.dropboxLink || "";
+            // Picture is file input, can't set value, but could show preview if we had an <img> tag
 
         } else {
             modalTitle.textContent = "Add New Staff";
@@ -202,9 +275,28 @@ window.initManageStaff = function () {
         modalOverlay.classList.add("hidden");
     }
 
+    // --- Action Modal Logic ---
+    let activeActionUser = null;
+
+    function openActionModal(user) {
+        if (!user) return;
+        activeActionUser = user;
+        if (actionStaffName) actionStaffName.textContent = user.name;
+        if (actionStaffRole) actionStaffRole.textContent = user.role;
+        if (actionModalOverlay) actionModalOverlay.classList.remove("hidden");
+    }
+
+    function closeActionModal() {
+        if (actionModalOverlay) actionModalOverlay.classList.add("hidden");
+        activeActionUser = null;
+    }
+
     // === Event Listeners ===
-    searchInput.addEventListener("input", renderTable);
-    branchFilter.addEventListener("change", renderTable);
+    if (searchInput) searchInput.addEventListener("input", renderTable);
+    if (branchFilter) branchFilter.addEventListener("change", renderTable);
+    if (deptFilter) deptFilter.addEventListener("change", renderTable);
+    if (statusFilter) statusFilter.addEventListener("change", renderTable);
+
     addUserBtn.addEventListener("click", () => openModal(false));
     closeBtn.addEventListener("click", closeModal);
     cancelBtn.addEventListener("click", closeModal);
@@ -223,8 +315,15 @@ window.initManageStaff = function () {
             email: inputs.staffEmail.value,
             role: inputs.staffRole.value,
             branch: !isGlobalAdmin ? currentUser.branch : inputs.staffBranch.value,
-            secondaryInfo: inputs.staffPhone.value
+            secondaryInfo: inputs.staffPhone.value,
+            dropboxLink: inputs.staffDropbox ? inputs.staffDropbox.value : ""
+            // Picture handling would involve FileReader or upload logic, for now we log it
         };
+
+        if (inputs.staffPicture && inputs.staffPicture.files[0]) {
+            console.log("Picture selected:", inputs.staffPicture.files[0].name);
+            data.profilePicture = inputs.staffPicture.files[0].name; // Mock persistence
+        }
 
         if (data.id) {
             window.UserService.updateUser(data.id, data);
@@ -237,23 +336,52 @@ window.initManageStaff = function () {
         renderTable();
     });
 
-    // Table Actions
+    // Table Actions (Legacy / Supporting specific clicks)
     tableBody.addEventListener("click", (e) => {
         const btn = e.target.closest("button");
         if (!btn) return;
         const id = btn.dataset.id;
         if (!id) return;
 
-        if (btn.classList.contains("edit-btn")) {
-            const user = window.UserService.getAllUsers().find(u => u.id == id);
-            if (user) openModal(true, user);
-        }
+        const user = window.UserService.getAllUsers().find(u => u.id == id);
+        if (!user) return;
 
+        if (btn.classList.contains("edit-btn")) {
+            openModal(true, user);
+        }
         if (btn.classList.contains("task-btn")) {
-            alert("Task Assignment Mode for " + id + " (Coming Soon)");
-            // Future: Open task assignment modal
+            triggerAssignTask(user);
+        }
+        if (btn.classList.contains("report-btn")) {
+            triggerReviewReports(user);
+        }
+        if (btn.classList.contains("query-btn")) {
+            triggerIssueQuery(user);
         }
     });
+
+    // Action Modal Button Handlers
+    if (closeActionModalBtn) closeActionModalBtn.onclick = closeActionModal;
+    if (actionModalOverlay) actionModalOverlay.onclick = (e) => { if (e.target === actionModalOverlay) closeActionModal(); };
+
+    if (btnAssignTask) btnAssignTask.onclick = () => { triggerAssignTask(activeActionUser); closeActionModal(); };
+    if (btnReviewReports) btnReviewReports.onclick = () => { triggerReviewReports(activeActionUser); closeActionModal(); };
+    if (btnIssueQuery) btnIssueQuery.onclick = () => { triggerIssueQuery(activeActionUser); closeActionModal(); };
+    if (btnEditProfile) btnEditProfile.onclick = () => { openModal(true, activeActionUser); closeActionModal(); };
+
+    // Action Triggers
+    function triggerAssignTask(user) {
+        alert(`📝 Task Assignment for ${user ? user.name : "Staff"}\nTargeting: ${user ? user.branch : 'Branch'}\nFeatures: Job Type, Deadline, Priority, Descriptions\nComing Soon!`);
+    }
+    function triggerReviewReports(user) {
+        alert(`📊 Staff Performance: ${user ? user.name : "Staff"}\nReviewing: Attendance, Jobs Completed, Sales Targets\nComing Soon!`);
+    }
+    function triggerIssueQuery(user) {
+        const reason = prompt(`Issue Official Query to ${user ? user.name : "Staff"}:\nReason:`);
+        if (reason) {
+            alert("Query issued and logged. Staff will be notified via email.");
+        }
+    }
 
     renderTable();
 };

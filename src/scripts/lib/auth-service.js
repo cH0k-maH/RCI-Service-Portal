@@ -34,6 +34,11 @@ class AuthService {
                     resolve({ success: true, role: "staff" });
                     return;
                 }
+                if (email === "engineer@rci.com" && password === "eng123") {
+                    this._setSession("staff", "Emmanuel Engineer", "Engineer", "Lagos");
+                    resolve({ success: true, role: "staff" });
+                    return;
+                }
                 if (email === "sales@rci.com" && password === "sales123") {
                     this._setSession("staff", "Sarah Sales", "Sales", "Lagos");
                     resolve({ success: true, role: "staff" });
@@ -45,7 +50,7 @@ class AuthService {
                     return;
                 }
                 if (email === "driver@rci.com" && password === "drive123") {
-                    this._setSession("staff", "Dan Driver", "Logistics", "Lagos");
+                    this._setSession("staff", "Dan Driver", "Driver", "Lagos");
                     resolve({ success: true, role: "staff" });
                     return;
                 }

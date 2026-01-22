@@ -15,38 +15,39 @@ window.initOverview = function () {
 
   // === 1. Populate KPIs with REAL Data ===
   function updateKPIs() {
-    // Data (Potential for optimization: Fetch from Backend with filter)
-    let users = window.UserService ? window.UserService.getAllUsers() : [];
-    let services = window.ServiceService ? window.ServiceService.getAllServices() : [];
-    let requests = window.RequestService ? window.RequestService.getAllRequests() : [];
-    let settings = window.SettingsService ? window.SettingsService.getSettings() : { branches: [{ active: true }, { active: true }, { active: true }] };
+    // Data
+    const allUsers = window.UserService ? window.UserService.getAllUsers() : [];
+    const allServices = window.ServiceService ? window.ServiceService.getAllServices() : [];
+    const allRequests = window.RequestService ? window.RequestService.getAllRequests() : [];
 
-    // Apply Filters for Branch Managers
-    if (!isGlobalAdmin) {
-      users = users.filter(u => u.branch === userBranch);
-      services = services.filter(s => s.branch === userBranch); // Assuming services have branch
-      requests = requests.filter(r => r.branch === userBranch);
-      // settings.branches // Can't filter really, just showing count
+    // Filter for Branch context
+    const branchUsers = allUsers.filter(u => u.branch === userBranch);
+    const branchServices = allServices.filter(s => s.branch === userBranch);
+    const branchRequests = allRequests.filter(r => r.branch === userBranch);
+
+    // Active Staff (Managers only see their branch staff)
+    const activeStaff = branchUsers.filter(u => u.type !== 'customer' && u.type !== 'dealer');
+    if (document.getElementById("ov-active-staff"))
+      document.getElementById("ov-active-staff").textContent = activeStaff.length;
+
+    // Operating Services (Active branch jobs)
+    if (document.getElementById("ov-active-services"))
+      document.getElementById("ov-active-services").textContent = branchServices.filter(s => s.status === 'Active').length;
+
+    // Pending Requests
+    if (document.getElementById("ov-pending-requests"))
+      document.getElementById("ov-pending-requests").textContent = branchRequests.filter(r => r.status === 'Pending').length;
+
+    // Reports Pending Approval (Simulated for now, or filtered from reports)
+    if (document.getElementById("ov-pending-reports")) {
+      // Mock: Assume 15% of branch requests or jobs need attention
+      const pendingReportsCount = Math.ceil(branchServices.length * 0.2);
+      document.getElementById("ov-pending-reports").textContent = pendingReportsCount;
     }
 
-    // Update Texts
-    if (document.getElementById("ov-total-users"))
-      document.getElementById("ov-total-users").textContent = users.length;
-
-    if (document.getElementById("ov-active-services"))
-      document.getElementById("ov-active-services").textContent = services.filter(s => s.status === 'Active').length;
-
-    if (document.getElementById("ov-pending-requests"))
-      document.getElementById("ov-pending-requests").textContent = requests.filter(r => r.status === 'Pending').length;
-
-    if (document.getElementById("ov-total-branches")) {
-      if (isGlobalAdmin) {
-        document.getElementById("ov-total-branches").textContent = settings.branches ? settings.branches.filter(b => b.active).length : 3;
-      } else {
-        // For Manager, maybe show "1" (Their Branch) or hide the card context
-        document.getElementById("ov-total-branches").textContent = "1";
-        document.getElementById("ov-total-branches").previousElementSibling.textContent = "My Branch"; // Hacky DOM access
-      }
+    // Global Admin overriding if needed (Optional: Admin might want to see global or branch specific)
+    if (isGlobalAdmin && branchSelect && branchSelect.value === 'all') {
+      // ... Admin specific global logic could go here ...
     }
   }
 
@@ -126,7 +127,7 @@ window.initOverview = function () {
       selectedBranch = userBranch.toLowerCase();
       if (branchFilter) {
         branchFilter.value = selectedBranch;
-        branchFilter.disabled = true; // Lock the filter
+        branchFilter.parentElement.style.display = "none"; // Hide the entire label + select
       }
     } else {
       selectedBranch = branchFilter ? branchFilter.value.toLowerCase() : 'all';

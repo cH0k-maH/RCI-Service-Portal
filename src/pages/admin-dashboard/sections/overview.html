@@ -4,17 +4,17 @@
 
   <!-- KPI CARDS -->
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-    <!-- Total Users -->
+    <!-- Active Staff -->
     <div class="kpi-card cursor-pointer bg-gray-100 border-l-4 border-red-600 p-5 rounded shadow hover:bg-gray-200"
-      data-target="users">
-      <h4 class="text-sm text-gray-600">Total Users</h4>
-      <p class="text-3xl font-bold text-black" id="ov-total-users">0</p>
+      data-target="manage-staff">
+      <h4 class="text-sm text-gray-600">Active Staff</h4>
+      <p class="text-3xl font-bold text-black" id="ov-active-staff">0</p>
     </div>
 
-    <!-- Active Services -->
+    <!-- Operating Services -->
     <div class="kpi-card cursor-pointer bg-gray-100 border-l-4 border-black p-5 rounded shadow hover:bg-gray-200"
       data-target="services">
-      <h4 class="text-sm text-gray-600">Active Services</h4>
+      <h4 class="text-sm text-gray-600">Operating Services</h4>
       <p class="text-3xl font-bold text-black" id="ov-active-services">0</p>
     </div>
 
@@ -25,10 +25,11 @@
       <p class="text-3xl font-bold text-black" id="ov-pending-requests">0</p>
     </div>
 
-    <!-- Total Branches -->
-    <div class="bg-gray-100 border-l-4 border-black p-5 rounded shadow cursor-default">
-      <h4 class="text-sm text-gray-600">Branches</h4>
-      <p class="text-3xl font-bold text-black" id="ov-total-branches">3</p>
+    <!-- Reports for Approval -->
+    <div class="kpi-card cursor-pointer bg-gray-100 border-l-4 border-black p-5 rounded shadow hover:bg-gray-200"
+      data-target="reports">
+      <h4 class="text-sm text-gray-600">Reports Pending Approval</h4>
+      <p class="text-3xl font-bold text-black" id="ov-pending-reports">0</p>
     </div>
   </div>
 
@@ -168,13 +169,45 @@
     </div>
   </div>
 
-  <!-- RECENT ACTIVITY LOG -->
-  <div class="bg-white rounded shadow p-6">
-    <h3 class="text-lg font-semibold mb-4">Recent Activities</h3>
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- RECENT ACTIVITY LOG -->
+    <div class="bg-white rounded shadow p-6">
+      <h3 class="text-lg font-semibold mb-4 text-gray-800">Recent Branch Activities</h3>
+      <ul class="space-y-3 text-sm" id="ov-activity-log">
+        <!-- Injected via JS -->
+      </ul>
+    </div>
 
-    <ul class="space-y-2 text-sm" id="ov-activity-log">
-      <!-- Injected via JS -->
-    </ul>
+    <!-- QUICK ALERTS -->
+    <div class="bg-white rounded shadow p-6 border-t-4 border-red-500">
+      <h3 class="text-lg font-semibold mb-4 text-gray-800 flex items-center">
+        <i class="fas fa-exclamation-triangle text-red-500 mr-2"></i> Quick Alerts
+      </h3>
+      <ul class="space-y-4" id="ov-quick-alerts">
+        <!-- Simulated Alerts -->
+        <li class="flex items-center text-sm p-3 bg-red-50 text-red-700 rounded-lg border border-red-100">
+          <i class="fas fa-clock mr-3 text-lg"></i>
+          <div>
+            <div class="font-bold">Overdue Job: AC Maintenance</div>
+            <div class="text-xs">Engineer: John Doe • 2 days late</div>
+          </div>
+        </li>
+        <li class="flex items-center text-sm p-3 bg-yellow-50 text-yellow-800 rounded-lg border border-yellow-100">
+          <i class="fas fa-comment-dots mr-3 text-lg"></i>
+          <div>
+            <div class="font-bold">Unanswered Query</div>
+            <div class="text-xs">Sales Staff: Sarah J. • Since Yesterday</div>
+          </div>
+        </li>
+        <li class="flex items-center text-sm p-3 bg-blue-50 text-blue-800 rounded-lg border border-blue-100">
+          <i class="fas fa-clipboard-check mr-3 text-lg"></i>
+          <div>
+            <div class="font-bold">New Weekly Activity Draft</div>
+            <div class="text-xs">Ready for your review and approval</div>
+          </div>
+        </li>
+      </ul>
+    </div>
   </div>
 
 </div>

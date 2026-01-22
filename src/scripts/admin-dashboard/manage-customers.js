@@ -33,6 +33,22 @@ window.initManageCustomers = function () {
     const closeBtn = document.getElementById("close-user-modal");
     const cancelBtn = document.getElementById("cancel-user-modal");
 
+    // Admin-Only: Add Client Button
+    if (addUserBtn && !isGlobalAdmin) {
+        addUserBtn.style.display = 'none';
+    }
+
+    // Action Modal Elements
+    const actionModalOverlay = document.getElementById("customer-action-modal-overlay");
+    const actionCustomerName = document.getElementById("action-customer-name");
+    const actionCustomerType = document.getElementById("action-customer-type");
+    const closeActionModalBtn = document.getElementById("close-customer-action-modal");
+
+    const btnServiceHistory = document.getElementById("btn-service-history");
+    const btnLogComplaint = document.getElementById("btn-log-complaint");
+    const btnAssignSales = document.getElementById("btn-assign-sales");
+    const btnEditProfile = document.getElementById("btn-edit-customer-profile");
+
     // Type Selector - We will toggle between Customer and Dealer only
     const accountTypeSelector = document.getElementById("account-type-selector");
     if (accountTypeSelector) {
@@ -66,6 +82,8 @@ window.initManageCustomers = function () {
         customerContact: document.getElementById("customer-contact-name"),
         customerEmail: document.getElementById("customer-email"),
         customerType: document.getElementById("customer-type"),
+        customerPicture: document.getElementById("customer-picture"),
+        customerDropbox: document.getElementById("customer-dropbox")
     };
 
     function updateFormVisibility() {
@@ -94,9 +112,12 @@ window.initManageCustomers = function () {
             branchTerm = currentUser.branch;
             if (branchFilter) {
                 branchFilter.value = branchTerm;
-                // User requested removal from view
                 branchFilter.style.display = "none";
+                branchFilter.parentElement.style.display = "none";
             }
+        } else {
+            // Admin can see the filter
+            if (branchFilter) branchFilter.classList.remove("hidden");
         }
 
         const filteredUsers = users.filter(user => {
@@ -116,41 +137,61 @@ window.initManageCustomers = function () {
 
             filteredUsers.forEach(user => {
                 const tr = document.createElement("tr");
-                tr.className = "hover:bg-gray-50 transition";
+                tr.className = "hover:bg-red-50 transition border-b cursor-pointer group";
+
+                // Row Click opens Action Modal
+                tr.onclick = (e) => {
+                    if (e.target.closest("button")) return;
+                    openCustomerActionModal(user);
+                };
 
                 let icon = "fa-building";
                 if (user.type === 'dealer') icon = "fa-handshake";
 
+                // Status Badge
+                const statusStr = user.status || "Active";
+                let statusClass = "bg-green-100 text-green-800";
+                if (statusStr === "Suspended") statusClass = "bg-red-100 text-red-800";
+
+                // Simulated Module Data
+                const serviceCount = Math.floor(Math.random() * 4);
+                const complaintCount = Math.floor(Math.random() * 2);
+                const lastContact = "3 days ago";
+
                 tr.innerHTML = `
                 <td class="px-6 py-4 whitespace-nowrap">
                    <div class="flex items-center">
-                      <div class="flex-shrink-0 h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 mr-3">
+                      <div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 mr-3 border border-gray-100">
                         <i class="fas ${icon}"></i>
                       </div>
                       <div>
                         <div class="text-sm font-bold text-gray-900">${user.name}</div>
-                        <div class="text-xs text-gray-500 uppercase">${user.type}</div>
+                        <div class="text-xs text-gray-500 uppercase font-medium">${user.type} • ${user.displayRole || '-'}</div>
                       </div>
                    </div>
                 </td>
-                 <td class="px-6 py-4 whitespace-nowrap">
-                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
-                        ${user.displayRole || user.type}
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="px-2.5 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass}">
+                        ${statusStr}
                     </span>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                   <div class="text-sm text-gray-900">${user.email}</div>
-                   <div class="text-xs text-gray-500">${user.secondaryInfo || '-'}</div>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 font-medium">
+                   <div class="flex items-center">
+                      <i class="fas fa-tools text-gray-400 mr-2"></i>
+                      <span>${serviceCount} Active</span>
+                   </div>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${user.branch || '-'}</td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                        ${user.status || 'Active'}
-                    </span>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                    ${complaintCount > 0 ? `<span class="text-red-600 font-bold flex items-center"><i class="fas fa-exclamation-circle mr-1"></i> ${complaintCount} Pending</span>` : `<span class="text-green-600 italic">None</span>`}
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium space-x-3">
-                    <button class="text-blue-600 hover:text-blue-900 edit-btn" data-id="${user.id}"><i class="fas fa-edit"></i></button>
-                    ${!isGlobalAdmin ? `<button class="text-green-600 hover:text-green-900 sales-btn" data-id="${user.id}" title="Assign to Sales"><i class="fas fa-user-tag"></i></button>` : ''}
+                <td class="px-6 py-4 whitespace-nowrap text-xs text-gray-500 italic">
+                   ${lastContact}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium space-x-2">
+                    <button class="text-blue-600 hover:text-blue-900 edit-btn bg-blue-50 p-2 rounded shadow-sm" data-id="${user.id}" title="Edit Profile"><i class="fas fa-user-edit"></i></button>
+                    <button class="text-purple-600 hover:text-purple-900 history-btn bg-purple-50 p-2 rounded shadow-sm" data-id="${user.id}" title="Service History"><i class="fas fa-history"></i></button>
+                    <button class="text-green-600 hover:text-green-900 sales-btn bg-green-50 p-2 rounded shadow-sm" data-id="${user.id}" title="Assign to Sales"><i class="fas fa-user-tag"></i></button>
+                    <button class="text-red-600 hover:text-red-900 complaint-btn bg-red-50 p-2 rounded shadow-sm" data-id="${user.id}" title="Log Complaint"><i class="fas fa-comment-medical"></i></button>
                 </td>
             `;
                 tableBody.appendChild(tr);
@@ -169,6 +210,12 @@ window.initManageCustomers = function () {
         } else {
             if (inputs.customerBranch) inputs.customerBranch.disabled = false;
             if (inputs.dealerBranch) inputs.dealerBranch.disabled = false;
+        }
+
+        // Hide branch parent for managers in modal
+        if (!isGlobalAdmin) {
+            if (inputs.customerBranch) inputs.customerBranch.parentElement.style.display = 'none';
+            if (inputs.dealerBranch) inputs.dealerBranch.parentElement.style.display = 'none';
         }
 
         if (isEdit && userData) {
@@ -195,6 +242,7 @@ window.initManageCustomers = function () {
                 inputs.customerEmail.value = userData.email;
                 inputs.customerBranch.value = userData.branch;
                 inputs.customerType.value = userData.displayRole;
+                if (inputs.customerDropbox) inputs.customerDropbox.value = userData.dropboxLink || "";
             }
 
         } else {
@@ -216,6 +264,26 @@ window.initManageCustomers = function () {
 
     function closeModal() {
         modalOverlay.classList.add("hidden");
+    }
+
+    // --- Action Modal Logic ---
+    let activeActionUser = null;
+
+    function openCustomerActionModal(user) {
+        if (!user) return;
+        activeActionUser = user;
+        if (actionCustomerName) actionCustomerName.textContent = user.name;
+        if (actionCustomerType) actionCustomerType.textContent = (user.type || 'Customer').toUpperCase();
+        if (actionModalOverlay) actionModalOverlay.classList.remove("hidden");
+        if (actionModalOverlay) actionModalOverlay.classList.add("flex");
+    }
+
+    function closeCustomerActionModal() {
+        if (actionModalOverlay) {
+            actionModalOverlay.classList.add("hidden");
+            actionModalOverlay.classList.remove("flex");
+        }
+        activeActionUser = null;
     }
 
     // === Event Listeners ===
@@ -249,6 +317,12 @@ window.initManageCustomers = function () {
             data.role = "Customer";
             data.displayRole = inputs.customerType.value;
             data.secondaryInfo = data.contactPerson;
+            data.dropboxLink = inputs.customerDropbox ? inputs.customerDropbox.value : "";
+        }
+
+        if (inputs.customerPicture && inputs.customerPicture.files[0]) {
+            console.log("Customer Picture selected:", inputs.customerPicture.files[0].name);
+            data.profilePicture = inputs.customerPicture.files[0].name;
         }
 
         if (data.id) {
@@ -262,22 +336,52 @@ window.initManageCustomers = function () {
         renderTable();
     });
 
-    // Table Actions
+    // Table Actions (Legacy / Supporting specific clicks)
     tableBody.addEventListener("click", (e) => {
         const btn = e.target.closest("button");
         if (!btn) return;
         const id = btn.dataset.id;
         if (!id) return;
 
-        if (btn.classList.contains("edit-btn")) {
-            const user = window.UserService.getAllUsers().find(u => u.id == id);
-            if (user) openModal(true, user);
-        }
+        const user = window.UserService.getAllUsers().find(u => u.id == id);
+        if (!user) return;
 
+        if (btn.classList.contains("edit-btn")) {
+            openModal(true, user);
+        }
         if (btn.classList.contains("sales-btn")) {
-            alert("Assign to Sales Staff for " + id + " (Coming Soon)");
+            triggerSalesAssignment(user);
+        }
+        if (btn.classList.contains("history-btn")) {
+            triggerServiceHistory(user);
+        }
+        if (btn.classList.contains("complaint-btn")) {
+            triggerLogComplaint(user);
         }
     });
+
+    // Action Modal Button Handlers
+    if (closeActionModalBtn) closeActionModalBtn.onclick = closeCustomerActionModal;
+    if (actionModalOverlay) actionModalOverlay.onclick = (e) => { if (e.target === actionModalOverlay) closeCustomerActionModal(); };
+
+    if (btnServiceHistory) btnServiceHistory.onclick = () => { triggerServiceHistory(activeActionUser); closeCustomerActionModal(); };
+    if (btnLogComplaint) btnLogComplaint.onclick = () => { triggerLogComplaint(activeActionUser); closeCustomerActionModal(); };
+    if (btnAssignSales) btnAssignSales.onclick = () => { triggerSalesAssignment(activeActionUser); closeCustomerActionModal(); };
+    if (btnEditProfile) btnEditProfile.onclick = () => { openModal(true, activeActionUser); closeCustomerActionModal(); };
+
+    // Action Triggers
+    function triggerServiceHistory(user) {
+        alert(`📜 Service History for ${user ? user.name : "Client"}\n(View all past maintenance, tickets, and installations)\nComing Soon!`);
+    }
+    function triggerLogComplaint(user) {
+        const desc = prompt(`Log New Complaint for ${user ? user.name : "Client"}:\nDescription:`);
+        if (desc) {
+            alert("Complaint logged. Assigned to Customer Service automatically.");
+        }
+    }
+    function triggerSalesAssignment(user) {
+        alert(`👤 Assign ${user ? user.name : "Client"} to Sales Representative\nComing Soon!`);
+    }
 
     renderTable();
 };

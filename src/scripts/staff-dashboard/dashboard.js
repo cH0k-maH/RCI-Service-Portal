@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // Get Staff Details
     // Defaulting to "engineer" and "Lagos" if not set, for development testing
-    const staffType = localStorage.getItem("staffType") || "engineer";
+    const staffType = (localStorage.getItem("staffType") || "engineer").toLowerCase();
     const branch = localStorage.getItem("branch") || "Lagos";
     const userName = localStorage.getItem("userName") || "Staff Member";
 
@@ -160,7 +160,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Handle Routing
     function handleHashChange() {
         const hash = window.location.hash.substring(1);
-        const section = hash || "activities"; // DEFAULT TO ACTIVITIES, NOT OVERVIEW
+        const section = hash || "overview";
         loadSection(section);
     }
 

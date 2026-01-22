@@ -14,9 +14,27 @@
                 <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
             </div>
 
-            <!-- Filter by Branch (Can be hidden by JS) -->
-            <select id="branch-filter"
+            <!-- Filter by Department -->
+            <select id="dept-filter"
                 class="border rounded-lg px-3 py-2 focus:ring-red-600 focus:border-red-600 bg-white">
+                <option value="">All Departments</option>
+                <option value="Sales">Sales</option>
+                <option value="Engineer">Engineer</option>
+                <option value="Secretary">Secretary</option>
+                <option value="Logistics">Driver / Logistics</option>
+            </select>
+
+            <!-- Filter by Status -->
+            <select id="status-filter"
+                class="border rounded-lg px-3 py-2 focus:ring-red-600 focus:border-red-600 bg-white">
+                <option value="">All Statuses</option>
+                <option value="Active">Active</option>
+                <option value="On Leave">On Leave</option>
+            </select>
+
+            <!-- Filter by Branch (Hidden by JS for Managers) -->
+            <select id="branch-filter"
+                class="hidden border rounded-lg px-3 py-2 focus:ring-red-600 focus:border-red-600 bg-white">
                 <option value="">All Branches</option>
                 <option value="Lagos">Lagos</option>
                 <option value="Abuja">Abuja</option>
@@ -36,20 +54,18 @@
         <div class="overflow-x-auto">
             <table class="min-w-full text-sm divide-y divide-gray-200">
                 <thead class="bg-gray-50">
-                    <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Identity</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role
-                        </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Contacts</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Branch</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Status</th>
-                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Actions</th>
-                    </tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Staff Identity</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Status</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Assigned Tasks</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Reports</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Last Activity</th>
+                    <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Actions</th>
                 </thead>
                 <tbody id="users-table-body" class="bg-white divide-y divide-gray-200">
                     <!-- Rows will be injected by JS -->
@@ -66,7 +82,7 @@
 
 <!-- USER MODAL (Hidden) -->
 <div id="user-modal-overlay"
-    class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center overflow-y-auto pt-10 pb-10">
+    class="hidden fixed inset-0 bg-black/50 z-[100] items-center justify-center overflow-y-auto pt-10 pb-10">
     <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl mx-4 relative animate-fadeIn my-auto">
 
         <!-- Header -->
@@ -158,7 +174,24 @@
             <div class="pt-4">
                 <label class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
                 <textarea id="common-notes" rows="2"
-                    class="w-full border-gray-300 rounded-lg shadow-sm px-3 py-2"></textarea>
+                    class="w-full border-gray-300 rounded-lg shadow-sm px-3 py-2 focus:ring-red-500 focus:border-red-500"></textarea>
+            </div>
+
+            <!-- New Fields: Picture & Dropbox -->
+            <div class="pt-4 border-t border-gray-100 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Profile Picture</label>
+                    <input type="file" id="staff-picture" accept="image/*"
+                        class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-red-50 file:text-red-700 hover:file:bg-red-100 border border-gray-200 rounded-lg px-2 py-1">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Dropbox Folder Link</label>
+                    <div class="relative">
+                        <input type="url" id="staff-dropbox" placeholder="https://dropbox.com/sh/..."
+                            class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 px-3 py-2 pl-10 text-sm">
+                        <i class="fab fa-dropbox absolute left-3 top-3 text-blue-500"></i>
+                    </div>
+                </div>
             </div>
 
             <!-- Footer Buttons -->
@@ -171,5 +204,68 @@
                     Staff</button>
             </div>
         </form>
+    </div>
+</div>
+
+<!-- STAFF ACTION MODAL (New) -->
+<div id="staff-action-modal-overlay" class="hidden fixed inset-0 bg-black/50 z-[100] items-center justify-center">
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-md mx-4 animate-fadeIn">
+        <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50 rounded-t-xl">
+            <div>
+                <h3 id="action-staff-name" class="text-xl font-bold text-gray-800">Staff Name</h3>
+                <p id="action-staff-role" class="text-sm text-gray-500">Engineer</p>
+            </div>
+            <button id="close-action-modal" class="text-gray-400 hover:text-red-600 text-2xl">&times;</button>
+        </div>
+
+        <div class="p-6 space-y-4">
+            <button id="btn-assign-task"
+                class="w-full flex items-center justify-between p-4 border border-gray-200 rounded-xl hover:bg-red-50 hover:border-red-200 transition group">
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 bg-red-100 text-red-600 rounded-full flex items-center justify-center">
+                        <i class="fas fa-tasks"></i>
+                    </div>
+                    <div class="text-left">
+                        <div class="font-bold text-gray-800">Assign New Task</div>
+                        <div class="text-xs text-gray-500">Deploy staff to a specific job</div>
+                    </div>
+                </div>
+                <i class="fas fa-chevron-right text-gray-300 group-hover:text-red-400"></i>
+            </button>
+
+            <button id="btn-review-reports"
+                class="w-full flex items-center justify-between p-4 border border-gray-200 rounded-xl hover:bg-black/5 hover:border-black/10 transition group">
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 bg-gray-100 text-gray-800 rounded-full flex items-center justify-center">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <div class="text-left">
+                        <div class="font-bold text-gray-800">Review Reports</div>
+                        <div class="text-xs text-gray-500">View performance & activity logs</div>
+                    </div>
+                </div>
+                <i class="fas fa-chevron-right text-gray-300 group-hover:text-gray-500"></i>
+            </button>
+
+            <button id="btn-issue-query"
+                class="w-full flex items-center justify-between p-4 border border-red-100 rounded-xl hover:bg-red-50 transition group">
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 bg-red-50 text-red-700 rounded-full flex items-center justify-center">
+                        <i class="fas fa-question-circle"></i>
+                    </div>
+                    <div class="text-left">
+                        <div class="font-bold text-red-700">Issue Official Query</div>
+                        <div class="text-xs text-red-500">Request formal explanation for an event</div>
+                    </div>
+                </div>
+                <i class="fas fa-chevron-right text-red-200 group-hover:text-red-400"></i>
+            </button>
+        </div>
+
+        <div class="p-4 bg-gray-50 rounded-b-xl text-center border-t border-gray-100">
+            <button id="btn-edit-staff-profile" class="text-sm font-medium text-blue-600 hover:underline">
+                <i class="fas fa-user-edit mr-1"></i> View Full Profile & Edit
+            </button>
+        </div>
     </div>
 </div>

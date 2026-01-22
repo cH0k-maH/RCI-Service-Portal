@@ -2,7 +2,19 @@
 
 window.initRequests = function () {
     console.log("Requests Management initialized");
-    if (localStorage.getItem("userRole") !== "admin") return;
+    // === Auth & RBAC ===
+    const currentUser = {
+        role: localStorage.getItem("staffType"),
+        branch: localStorage.getItem("branch"),
+        isAdmin: window.AuthService.getRole() === 'admin'
+    };
+    const isGlobalAdmin = currentUser.isAdmin || (currentUser.role && currentUser.role.toUpperCase() === 'ADMIN');
+    const isManager = currentUser.role && currentUser.role.toUpperCase() === 'MANAGER';
+
+    if (!isGlobalAdmin && !isManager) {
+        document.getElementById("dashboard-container").innerHTML = "<div class='p-10 text-red-600'>Access Denied. Only Admin and Managers can view requests.</div>";
+        return;
+    }
 
     // === UI Elements ===
     const tableBody = document.getElementById("requests-table-body");
@@ -72,7 +84,7 @@ window.initRequests = function () {
             branchTerm = currentUser.branch;
             if (branchFilter) {
                 branchFilter.value = branchTerm;
-                branchFilter.disabled = true;
+                branchFilter.style.display = "none"; // Total removal from view
             }
         }
 
