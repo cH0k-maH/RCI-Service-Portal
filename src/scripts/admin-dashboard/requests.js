@@ -228,9 +228,9 @@ window.initRequests = function () {
                     status: "Pending",
                     startDate: new Date().toISOString().split('T')[0]
                 });
-                alert("Request Approved! A new Pending Service has been created.");
+                window.ToastService.success("Request Approved! A new Pending Service has been created.");
             } else {
-                alert("Request Approved!");
+                window.ToastService.success("Request Approved!");
             }
 
             closeModal();
@@ -250,7 +250,7 @@ window.initRequests = function () {
         // 2. Validate reason
         const reason = reqRejectReason.value.trim();
         if (!reason) {
-            alert("Please provide a rejection reason.");
+            window.ToastService.warning("Please provide a rejection reason.");
             return;
         }
 
@@ -261,7 +261,7 @@ window.initRequests = function () {
                 rejectionReason: reason,
                 notes: reqNotes.value
             });
-            alert("Request Rejected.");
+            window.ToastService.success("Request Rejected.");
             closeModal();
             renderTable();
         }

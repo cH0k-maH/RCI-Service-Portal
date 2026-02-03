@@ -12,10 +12,23 @@
     <div class="flex items-center space-x-6">
 
         <!-- Notifications -->
-        <button class="relative text-gray-500 hover:text-gray-700">
-            <i class="fas fa-bell text-lg"></i>
-            <span class="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full border-2 border-white"></span>
-        </button>
+        <div class="relative">
+            <button id="notification-bell" class="text-gray-500 hover:text-red-600 transition-colors relative p-1">
+                <i class="fas fa-bell text-lg"></i>
+                <span id="notification-badge"
+                    class="hidden absolute top-0 right-0 h-4 w-4 bg-red-600 rounded-full text-[10px] text-white flex items-center justify-center border border-white">0</span>
+            </button>
+            <div id="notification-dropdown"
+                class="hidden absolute right-0 mt-3 w-80 bg-white rounded-xl shadow-xl border border-gray-100 z-50 animate-fadeIn">
+                <div class="p-4 border-b flex justify-between items-center">
+                    <h3 class="font-bold text-gray-800">Notifications</h3>
+                    <button id="mark-all-read" class="text-xs text-red-600 hover:underline">Mark all read</button>
+                </div>
+                <div id="notification-list" class="max-h-96 overflow-y-auto">
+                    <div class="p-8 text-center text-gray-400 text-sm">No new notifications</div>
+                </div>
+            </div>
+        </div>
 
         <!-- Profile Info -->
         <div class="flex items-center space-x-3">
@@ -23,9 +36,10 @@
                 <div id="user-name" class="text-sm font-bold text-gray-800 leading-none">Scanning...</div>
                 <div id="user-role" class="text-xs text-gray-500 mt-1 uppercase tracking-wide">Staff</div>
             </div>
-            <div
-                class="h-10 w-10 rounded-full bg-red-100 flex items-center justify-center text-red-600 font-bold border border-red-200">
-                <i class="fas fa-user"></i>
+            <div id="user-avatar-container"
+                class="h-10 w-10 rounded-full bg-red-100 flex items-center justify-center text-red-600 font-bold border border-red-200 overflow-hidden">
+                <img id="topbar-avatar-img" class="hidden w-full h-full object-cover">
+                <span id="topbar-initials">S</span>
             </div>
         </div>
     </div>

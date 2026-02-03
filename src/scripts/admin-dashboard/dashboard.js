@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Ensure AuthService is available
   if (!window.AuthService) {
     console.error("AuthService not found!");
-    alert("System Error: Auth service missing.");
+    window.ToastService.error("System Error: Auth service missing.");
     return;
   }
 
@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Basic Access Check
   // Note: "ADMIN" logic usually covers system admin. Manager/Secretary are staff but privileged.
   if (currentUser.type !== 'admin' && !allowedRoles.includes(userRoleKey)) {
-    alert("Access denied. Use the Staff Dashboard.");
+    window.ToastService.warning("Access denied. Use the Staff Dashboard.");
     window.location.href = "../staff-dashboard/staff-dashboard.html";
     return;
   }
@@ -188,6 +188,21 @@ document.addEventListener("DOMContentLoaded", async () => {
   await loadComponent(sidebarContainer, sectionsPath + "sidebar.html");
   await loadComponent(topbarContainer, sectionsPath + "topbar.html");
 
+  // Update Topbar Profile
+  const userName = localStorage.getItem("userName") || "Administrator";
+  const initialsEl = document.getElementById("topbar-initials");
+  const avatarImg = document.getElementById("topbar-avatar-img");
+
+  if (window.UserService && initialsEl) {
+    initialsEl.textContent = window.UserService.getInitials(userName);
+    const savedPic = localStorage.getItem("userProfilePic");
+    if (savedPic && avatarImg) {
+      avatarImg.src = savedPic;
+      avatarImg.classList.remove("hidden");
+      initialsEl.classList.add("hidden");
+    }
+  }
+
   // Apply Permissions (Hide sidebar items)
   applyPermissions();
 
@@ -202,6 +217,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     } else {
       titleEl.textContent = "RCI Staff";
     }
+  }
+
+  // Initialize Notifications
+  if (window.NotificationUI) {
+    const userId = localStorage.getItem("userId") || 1; // Fallback for admin
+    window.NotificationUI.init(userId, 'staff');
   }
 
   // 2. Handle Routing (Hash-based)

@@ -1,4 +1,4 @@
-window.initManageCustomers = function () {
+window.initManageCustomers = async function () {
     console.log("Manage Customers initialized");
 
     // Check Auth & Permissions
@@ -10,7 +10,6 @@ window.initManageCustomers = function () {
     const isGlobalAdmin = currentUser.isAdmin || (currentUser.role && currentUser.role.toUpperCase() === 'ADMIN');
 
     if (!window.UserService.can(currentUser, "view_branch_users") && !isGlobalAdmin) {
-        // Managers usually have permission to view their branch clients
         document.getElementById("dashboard-container").innerHTML = "<div class='p-10 text-red-600'>Access Denied.</div>";
         return;
     }
@@ -19,11 +18,22 @@ window.initManageCustomers = function () {
     const pageTitle = document.querySelector("#dashboard-container h2");
     if (pageTitle) pageTitle.textContent = "Branch Customer Management";
 
+    // === Dynamic Data Loading ===
+    const branches = await window.UserService.getBranches();
+
     // === UI Elements ===
     const tableBody = document.getElementById("users-table-body");
     const noUsersMsg = document.getElementById("no-users-msg");
     const searchInput = document.getElementById("user-search");
     const branchFilter = document.getElementById("branch-filter");
+
+    // Populate Filters
+    if (branchFilter) {
+        branchFilter.innerHTML = '<option value="">All Branches</option>';
+        branches.forEach(b => {
+            branchFilter.innerHTML += `<option value="${b.name}">${b.name}</option>`;
+        });
+    }
 
     // Modal Elements
     const modalOverlay = document.getElementById("user-modal-overlay");
@@ -32,11 +42,6 @@ window.initManageCustomers = function () {
     const addUserBtn = document.getElementById("addUserBtn");
     const closeBtn = document.getElementById("close-user-modal");
     const cancelBtn = document.getElementById("cancel-user-modal");
-
-    // Admin-Only: Add Client Button
-    if (addUserBtn && !isGlobalAdmin) {
-        addUserBtn.style.display = 'none';
-    }
 
     // Action Modal Elements
     const actionModalOverlay = document.getElementById("customer-action-modal-overlay");
@@ -49,36 +54,62 @@ window.initManageCustomers = function () {
     const btnAssignSales = document.getElementById("btn-assign-sales");
     const btnEditProfile = document.getElementById("btn-edit-customer-profile");
 
-    // Type Selector - We will toggle between Customer and Dealer only
-    const accountTypeSelector = document.getElementById("account-type-selector");
-    if (accountTypeSelector) {
-        // Remove 'staff' option if possible or just hide it
-        // For simplicity, let's keep logic simple: show selector but hide 'Staff' option
-        for (let opt of accountTypeSelector.options) {
-            if (opt.value === 'staff') opt.style.display = 'none';
-        }
-        if (accountTypeSelector.value === 'staff') accountTypeSelector.value = 'customer';
+    // Complaint Modal Elements
+    const complaintModalOverlay = document.getElementById("complaint-modal-overlay");
+    const complaintForm = document.getElementById("complaint-form");
+    const closeComplaintBtn = document.getElementById("close-complaint-modal");
+    const cancelComplaintBtn = document.getElementById("cancel-complaint-modal");
+    const complaintClientIdInput = document.getElementById("complaint-client-id");
+
+    // History Modal Elements
+    const historyModalOverlay = document.getElementById("history-modal-overlay");
+    const closeHistoryBtn = document.getElementById("close-history-modal");
+    const closeHistoryBtnBottom = document.getElementById("close-history-btn");
+    const historyList = document.getElementById("history-list");
+    const historyClientName = document.getElementById("history-client-name");
+
+    // Assign Sales Modal Elements
+    const assignSalesModal = document.getElementById("assign-sales-modal-overlay");
+    const closeAssignSalesBtn = document.getElementById("close-assign-sales-modal");
+    const cancelAssignSalesBtn = document.getElementById("cancel-assign-sales-modal");
+    const assignSalesForm = document.getElementById("assign-sales-form");
+    const assignSalesSelect = document.getElementById("assign-sales-select");
+    const assignSalesClientName = document.getElementById("assign-sales-client-name");
+    const assignSalesClientId = document.getElementById("assign-sales-client-id");
+
+    // Admin-Only: Add Client Button
+    if (addUserBtn && !isGlobalAdmin) {
+        addUserBtn.style.display = 'none';
     }
 
-    // Sections
-    const sectionStaff = document.getElementById("form-section-staff");
-    const sectionDealer = document.getElementById("form-section-dealer");
-    const sectionCustomer = document.getElementById("form-section-customer");
+    // Populate Modal Dropdowns
+    const dealerBranchSelect = document.getElementById("dealer-branch");
+    const customerBranchSelect = document.getElementById("customer-branch");
 
-    // Input Fields
+    if (dealerBranchSelect) {
+        dealerBranchSelect.innerHTML = '<option value="">Select Branch</option>';
+        branches.forEach(b => dealerBranchSelect.innerHTML += `<option value="${b.id}">${b.name}</option>`);
+    }
+    if (customerBranchSelect) {
+        customerBranchSelect.innerHTML = '<option value="">Select Branch</option>';
+        branches.forEach(b => customerBranchSelect.innerHTML += `<option value="${b.id}">${b.name}</option>`);
+    }
+
+    // Input Fields (Rest of the code continues...)
     const inputs = {
         id: document.getElementById("user-id"),
         status: document.getElementById("common-status"),
+        password: document.getElementById("common-password"),
         notes: document.getElementById("common-notes"),
         // Dealer
         dealerCompany: document.getElementById("dealer-company"),
-        dealerBranch: document.getElementById("dealer-branch"),
+        dealerBranch: dealerBranchSelect,
         dealerContact: document.getElementById("dealer-contact-name"),
         dealerEmail: document.getElementById("dealer-email"),
         dealerServiceType: document.getElementById("dealer-service-type"),
         // Customer
         customerCompany: document.getElementById("customer-company"),
-        customerBranch: document.getElementById("customer-branch"),
+        customerBranch: customerBranchSelect,
         customerContact: document.getElementById("customer-contact-name"),
         customerEmail: document.getElementById("customer-email"),
         customerType: document.getElementById("customer-type"),
@@ -98,12 +129,33 @@ window.initManageCustomers = function () {
 
     if (accountTypeSelector) accountTypeSelector.addEventListener("change", updateFormVisibility);
 
+    // === Sorting Logic ===
+    let sortConfig = { key: null, direction: 'asc' };
+
+    function sortData(data) {
+        if (!sortConfig.key) return data;
+        return [...data].sort((a, b) => {
+            let valA = a[sortConfig.key] || "";
+            let valB = b[sortConfig.key] || "";
+            if (typeof valA === 'string') valA = valA.toLowerCase();
+            if (typeof valB === 'string') valB = valB.toLowerCase();
+
+            if (valA < valB) return sortConfig.direction === 'asc' ? -1 : 1;
+            if (valA > valB) return sortConfig.direction === 'asc' ? 1 : -1;
+            return 0;
+        });
+    }
+
     // === Render Function ===
-    function renderTable() {
-        let users = window.UserService.getAllUsers();
+    async function renderTable() {
+        let users = await window.UserService.getAllUsers();
+        console.log("Fetched users for table:", users);
 
         // Filter for Customers/Dealers
         users = users.filter(u => u.type === 'customer' || u.type === 'dealer');
+
+        // Apply Sorting
+        users = sortData(users);
 
         // Filter
         const searchTerm = searchInput.value.toLowerCase();
@@ -121,11 +173,13 @@ window.initManageCustomers = function () {
         }
 
         const filteredUsers = users.filter(user => {
-            if (branchTerm && user.branch !== branchTerm) return false;
+            if (branchTerm && String(user.branch).toLowerCase() !== String(branchTerm).toLowerCase()) return false;
             const name = (user.name || "").toLowerCase();
             const email = (user.email || "").toLowerCase();
             return name.includes(searchTerm) || email.includes(searchTerm);
         });
+
+        console.log(`🔍 Final filtered customers: ${filteredUsers.length}`);
 
         tableBody.innerHTML = "";
 
@@ -174,6 +228,9 @@ window.initManageCustomers = function () {
                     <span class="px-2.5 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass}">
                         ${statusStr}
                     </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-medium">
+                    ${user.branch || '-'}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 font-medium">
                    <div class="flex items-center">
@@ -254,6 +311,7 @@ window.initManageCustomers = function () {
             }
             updateFormVisibility();
             inputs.id.value = "";
+            if (inputs.password) inputs.password.value = "";
 
             if (!isGlobalAdmin) {
                 if (inputs.dealerBranch) inputs.dealerBranch.value = currentUser.branch;
@@ -288,14 +346,86 @@ window.initManageCustomers = function () {
 
     // === Event Listeners ===
     searchInput.addEventListener("input", renderTable);
-    branchFilter.addEventListener("change", renderTable);
+    if (branchFilter) branchFilter.addEventListener("change", renderTable);
+
+    // Sorting
+    const sortBranchHeader = document.getElementById("sort-branch-header");
+    // === Assign Sales Logic ===
+    window.openAssignSalesModal = async (user) => {
+        closeCustomerActionModal();
+        assignSalesModal.classList.remove("hidden");
+        assignSalesClientName.value = user.name;
+        assignSalesClientId.value = user.id;
+
+        // Populate Sales Reps
+        assignSalesSelect.innerHTML = '<option value="">Loading...</option>';
+        const allUsers = await window.UserService.getAllUsers();
+        // Assuming strict role 'sales' or filtering staff
+        const salesReps = allUsers.filter(u => (u.role && u.role.toLowerCase() === 'sales') || (u.department && u.department.toLowerCase() === 'sales'));
+
+        assignSalesSelect.innerHTML = '<option value="">Choose a Sales Representative...</option>';
+        salesReps.forEach(rep => {
+            const selected = (user.sales_rep_id == rep.id) ? 'selected' : '';
+            assignSalesSelect.innerHTML += `<option value="${rep.id}" ${selected}>${rep.name}</option>`;
+        });
+    };
+
+    function closeAssignSalesModal() {
+        assignSalesModal.classList.add("hidden");
+    }
+
+    if (closeAssignSalesBtn) closeAssignSalesBtn.onclick = closeAssignSalesModal;
+    if (cancelAssignSalesBtn) cancelAssignSalesBtn.onclick = closeAssignSalesModal;
+
+    if (assignSalesForm) {
+        assignSalesForm.onsubmit = async (e) => {
+            e.preventDefault();
+            const clientId = assignSalesClientId.value;
+            const salesRepId = assignSalesSelect.value;
+            const salesRepName = assignSalesSelect.options[assignSalesSelect.selectedIndex].text;
+
+            if (!salesRepId) {
+                window.ToastService.error("Please select a sales representative.");
+                return;
+            }
+
+            // Update User via UserService (mock update)
+            const res = await window.UserService.updateUser(clientId, { sales_rep_id: salesRepId, sales_rep_name: salesRepName });
+
+            if (res) { // UserService.updateUser returns result or false
+                window.ToastService.success(`Assigned to ${salesRepName}`);
+                closeAssignSalesModal();
+                renderTable(); // Refresh
+            } else {
+                window.ToastService.error("Failed to assign sales rep.");
+            }
+        };
+    }
+
+    if (sortBranchHeader) {
+        sortBranchHeader.addEventListener("click", () => {
+            if (sortConfig.key === 'branch') {
+                sortConfig.direction = sortConfig.direction === 'asc' ? 'desc' : 'asc';
+            } else {
+                sortConfig.key = 'branch';
+                sortConfig.direction = 'asc';
+            }
+            // Update icon
+            const icon = sortBranchHeader.querySelector("i");
+            if (icon) {
+                icon.className = `fas fa-sort-${sortConfig.direction === 'asc' ? 'up' : 'down'} ml-1 text-red-600`;
+            }
+            renderTable();
+        });
+    }
+
     addUserBtn.addEventListener("click", () => openModal(false));
     closeBtn.addEventListener("click", closeModal);
     cancelBtn.addEventListener("click", closeModal);
     modalOverlay.addEventListener("click", (e) => { if (e.target === modalOverlay) closeModal(); });
 
     // Form Submit
-    userForm.addEventListener("submit", (e) => {
+    userForm.addEventListener("submit", async (e) => {
         e.preventDefault();
         const type = accountTypeSelector ? accountTypeSelector.value : 'customer';
 
@@ -305,7 +435,7 @@ window.initManageCustomers = function () {
             data.name = inputs.dealerCompany.value;
             data.contactPerson = inputs.dealerContact.value;
             data.email = inputs.dealerEmail.value;
-            data.branch = !isGlobalAdmin ? currentUser.branch : inputs.dealerBranch.value;
+            data.branchId = inputs.dealerBranch.value; // Send ID
             data.role = "Dealer";
             data.displayRole = inputs.dealerServiceType.value;
             data.secondaryInfo = data.contactPerson;
@@ -313,11 +443,15 @@ window.initManageCustomers = function () {
             data.name = inputs.customerCompany.value;
             data.contactPerson = inputs.customerContact.value;
             data.email = inputs.customerEmail.value;
-            data.branch = !isGlobalAdmin ? currentUser.branch : inputs.customerBranch.value;
+            data.branchId = inputs.customerBranch.value; // Send ID
             data.role = "Customer";
             data.displayRole = inputs.customerType.value;
             data.secondaryInfo = data.contactPerson;
             data.dropboxLink = inputs.customerDropbox ? inputs.customerDropbox.value : "";
+        }
+
+        if (inputs.password && inputs.password.value) {
+            data.password = inputs.password.value;
         }
 
         if (inputs.customerPicture && inputs.customerPicture.files[0]) {
@@ -326,24 +460,25 @@ window.initManageCustomers = function () {
         }
 
         if (data.id) {
-            window.UserService.updateUser(data.id, data);
-            alert("Client updated successfully!");
+            await window.UserService.updateUser(data.id, data);
+            window.ToastService.success("Client updated successfully!");
         } else {
-            window.UserService.addUser(data);
-            alert("Client added successfully!");
+            await window.UserService.addUser(data);
+            window.ToastService.success("Client added successfully!");
         }
         closeModal();
-        renderTable();
+        await renderTable();
     });
 
     // Table Actions (Legacy / Supporting specific clicks)
-    tableBody.addEventListener("click", (e) => {
+    tableBody.addEventListener("click", async (e) => {
         const btn = e.target.closest("button");
         if (!btn) return;
         const id = btn.dataset.id;
         if (!id) return;
 
-        const user = window.UserService.getAllUsers().find(u => u.id == id);
+        const users = await window.UserService.getAllUsers();
+        const user = users.find(u => u.id == id);
         if (!user) return;
 
         if (btn.classList.contains("edit-btn")) {
@@ -370,17 +505,107 @@ window.initManageCustomers = function () {
     if (btnEditProfile) btnEditProfile.onclick = () => { openModal(true, activeActionUser); closeCustomerActionModal(); };
 
     // Action Triggers
-    function triggerServiceHistory(user) {
-        alert(`📜 Service History for ${user ? user.name : "Client"}\n(View all past maintenance, tickets, and installations)\nComing Soon!`);
-    }
-    function triggerLogComplaint(user) {
-        const desc = prompt(`Log New Complaint for ${user ? user.name : "Client"}:\nDescription:`);
-        if (desc) {
-            alert("Complaint logged. Assigned to Customer Service automatically.");
+    async function triggerServiceHistory(user) {
+        if (!user) return;
+        historyClientName.textContent = user.name;
+        historyList.innerHTML = `<div class="p-10 text-center"><i class="fas fa-circle-notch fa-spin text-2xl text-red-600"></i></div>`;
+        historyModalOverlay.classList.remove("hidden");
+        historyModalOverlay.classList.add("flex");
+
+        // Fetch Complaints
+        const complaints = await window.AdminToolService.getClientComplaints(user.id);
+
+        // Fetch Service Requests (Existing logic)
+        const requests = await window.RequestService.getRequests();
+        const clientRequests = requests.filter(r => r.clientId == user.id);
+
+        if (complaints.length === 0 && clientRequests.length === 0) {
+            historyList.innerHTML = `<div class="text-center py-10 text-gray-400 italic">No history records found for this client.</div>`;
+            return;
         }
+
+        historyList.innerHTML = "";
+
+        // Display Complaints
+        complaints.forEach(c => {
+            const div = document.createElement("div");
+            div.className = "p-4 border border-red-100 bg-red-50/30 rounded-lg";
+            div.innerHTML = `
+                <div class="flex justify-between items-start">
+                    <span class="px-2 py-0.5 bg-red-100 text-red-700 text-[10px] font-bold rounded uppercase">Complaint</span>
+                    <span class="text-[10px] text-gray-400 font-medium">${new Date(c.created_at).toLocaleDateString()}</span>
+                </div>
+                <h4 class="font-bold text-gray-800 mt-1">${c.subject}</h4>
+                <p class="text-xs text-gray-600 mt-1">${c.description}</p>
+                <div class="mt-2 text-[10px] font-bold text-red-600 uppercase tracking-widest">Status: ${c.status}</div>
+            `;
+            historyList.appendChild(div);
+        });
+
+        // Display Requests
+        clientRequests.forEach(r => {
+            const div = document.createElement("div");
+            div.className = "p-4 border border-blue-100 bg-blue-50/30 rounded-lg";
+            div.innerHTML = `
+                <div class="flex justify-between items-start">
+                    <span class="px-2 py-0.5 bg-blue-100 text-blue-700 text-[10px] font-bold rounded uppercase">Service Request</span>
+                    <span class="text-[10px] text-gray-400 font-medium">${r.date || '-'}</span>
+                </div>
+                <h4 class="font-bold text-gray-800 mt-1">${r.type}</h4>
+                <p class="text-xs text-gray-600 mt-1">${r.details || r.description || 'No details provided.'}</p>
+                <div class="mt-2 text-[10px] font-bold text-blue-600 uppercase tracking-widest">Status: ${r.status}</div>
+            `;
+            historyList.appendChild(div);
+        });
     }
+
+    function triggerLogComplaint(user) {
+        if (!user) return;
+        complaintClientIdInput.value = user.id;
+        document.querySelector("#complaint-modal-overlay h3").textContent = `Log Complaint: ${user.name}`;
+        complaintModalOverlay.classList.remove("hidden");
+        complaintModalOverlay.classList.add("flex");
+    }
+
     function triggerSalesAssignment(user) {
-        alert(`👤 Assign ${user ? user.name : "Client"} to Sales Representative\nComing Soon!`);
+        window.ToastService.info(`👤 Sales Assignment for ${user ? user.name : "Client"} - Coming Soon!`);
+    }
+
+    // Modal Close Handlers
+    const closeComplaintModal = () => {
+        complaintModalOverlay.classList.add("hidden");
+        complaintModalOverlay.classList.remove("flex");
+    };
+    if (closeComplaintBtn) closeComplaintBtn.onclick = closeComplaintModal;
+    if (cancelComplaintBtn) cancelComplaintBtn.onclick = closeComplaintModal;
+
+    const closeHistoryModal = () => {
+        historyModalOverlay.classList.add("hidden");
+        historyModalOverlay.classList.remove("flex");
+    };
+    if (closeHistoryBtn) closeHistoryBtn.onclick = closeHistoryModal;
+    if (closeHistoryBtnBottom) closeHistoryBtnBottom.onclick = closeHistoryModal;
+
+    // Form Submission
+    if (complaintForm) {
+        complaintForm.onsubmit = async (e) => {
+            e.preventDefault();
+            const complaintData = {
+                clientId: complaintClientIdInput.value,
+                subject: document.getElementById("complaint-subject").value,
+                description: document.getElementById("complaint-desc").value,
+                loggedBy: localStorage.getItem("userId") || 1
+            };
+
+            const res = await window.AdminToolService.logComplaint(complaintData);
+            if (!res.error) {
+                window.ToastService.success(`Complaint logged for ${activeActionUser ? activeActionUser.name : 'Client'}.`);
+                closeComplaintModal();
+                complaintForm.reset();
+            } else {
+                window.ToastService.error("Failed to log complaint.");
+            }
+        };
     }
 
     renderTable();

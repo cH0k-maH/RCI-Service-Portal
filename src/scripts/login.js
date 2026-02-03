@@ -141,7 +141,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const result = await window.AuthService.login(email, password);
 
         if (result.success) {
-          alert(`✅ Login successful! Welcome ${result.role}.`);
+          window.ToastService.success(`Welcome back, ${result.role}!`);
           // Redirect based on role
           // Dynamic Redirect based on Role Config
           const specificRole = localStorage.getItem("staffType"); // e.g. "manager", "engineer"
@@ -156,11 +156,11 @@ document.addEventListener("DOMContentLoaded", () => {
             window.location.href = redirectUrl;
           }, 500); // Small delay for UX
         } else {
-          alert(`❌ ${result.message}`);
+          window.ToastService.error(result.message);
         }
       } catch (error) {
         console.error("Login error:", error);
-        alert("An unexpected error occurred.");
+        window.ToastService.error("An unexpected error occurred. Please try again.");
       } finally {
         submitBtn.innerText = originalText;
         submitBtn.disabled = false;

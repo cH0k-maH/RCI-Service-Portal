@@ -1,6 +1,6 @@
 // src/scripts/admin-dashboard/manage-users.js
 
-window.initManageUsers = function () {
+window.initManageUsers = async function () {
   console.log("Manage Users initialized (Advanced)");
 
   // Check Auth & Permissions
@@ -9,15 +9,13 @@ window.initManageUsers = function () {
     branch: localStorage.getItem("branch")
   };
 
-  // Allow if Admin OR has VIEW_ALL_USERS permission (Manager)
-  // Note: We use the helper from UserService or direct check if RoleConfig is reliable.
-  // Using UserService.can requires the full user object with 'role' property.
-  // currentUser here has 'role' = specific role (e.g. 'manager').
-
   if (!window.UserService.can(currentUser, "view_all_users")) {
     document.getElementById("dashboard-container").innerHTML = "<div class='p-10 text-red-600'>Access Denied.</div>";
     return;
   }
+
+  // === Dynamic Data Loading ===
+  const branches = await window.UserService.getBranches();
 
   // === UI Elements ===
   const tableBody = document.getElementById("users-table-body");
@@ -25,7 +23,31 @@ window.initManageUsers = function () {
   const searchInput = document.getElementById("user-search");
   const branchFilter = document.getElementById("branch-filter");
 
+  // Populate Filters
+  if (branchFilter) {
+    branchFilter.innerHTML = '<option value="">All Branches</option>';
+    branches.forEach(b => {
+      branchFilter.innerHTML += `<option value="${b.name}">${b.name}</option>`;
+    });
+  }
+
+  // Populate Modal Dropdowns
+  const staffBranchSelect = document.getElementById("staff-branch");
+  const dealerBranchSelect = document.getElementById("dealer-branch");
+  const customerBranchSelect = document.getElementById("customer-branch");
+
+  const populate = (sel) => {
+    if (sel) {
+      sel.innerHTML = '<option value="">Select Branch</option>';
+      branches.forEach(b => sel.innerHTML += `<option value="${b.id}">${b.name}</option>`);
+    }
+  };
+  populate(staffBranchSelect);
+  populate(dealerBranchSelect);
+  populate(customerBranchSelect);
+
   // Modal Elements
+  // ... (rest remains same)
   const modalOverlay = document.getElementById("user-modal-overlay");
   const modalTitle = document.getElementById("modal-title");
   const userForm = document.getElementById("user-form");
@@ -45,30 +67,31 @@ window.initManageUsers = function () {
     id: document.getElementById("user-id"),
     // Common
     status: document.getElementById("common-status"),
+    password: document.getElementById("common-password"),
     notes: document.getElementById("common-notes"),
     // Staff
     staffName: document.getElementById("staff-name"),
     staffEmail: document.getElementById("staff-email"),
     staffPhone: document.getElementById("staff-phone"),
     staffRole: document.getElementById("staff-role"),
-    staffBranch: document.getElementById("staff-branch"),
+    staffBranch: staffBranchSelect,
     staffId: document.getElementById("staff-id"),
     // Dealer
     dealerCompany: document.getElementById("dealer-company"),
-    dealerBranch: document.getElementById("dealer-branch"),
+    dealerBranch: dealerBranchSelect,
     dealerContact: document.getElementById("dealer-contact-name"),
     dealerEmail: document.getElementById("dealer-email"),
     dealerServiceType: document.getElementById("dealer-service-type"),
     // Customer
     customerCompany: document.getElementById("customer-company"),
-    customerBranch: document.getElementById("customer-branch"),
+    customerBranch: customerBranchSelect,
     customerContact: document.getElementById("customer-contact-name"),
     customerEmail: document.getElementById("customer-email"),
     customerType: document.getElementById("customer-type"),
   };
 
   // === Permission Helpers ===
-  const isGlobalAdmin = window.AuthService.getRole() === "admin" || currentUser.role.toUpperCase() === "ADMIN";
+  const isGlobalAdmin = window.AuthService.getRole() === "admin" || (currentUser.role && currentUser.role.toUpperCase() === "ADMIN");
   const userBranch = currentUser.branch;
 
   // === UI Logic: Dynamic Form Switching ===
@@ -89,36 +112,24 @@ window.initManageUsers = function () {
   function getFormData() {
     const type = accountTypeSelector.value;
     const status = inputs.status.value;
+    const password = inputs.password.value;
     const notes = inputs.notes.value;
 
     let data = { type, status, notes, id: inputs.id.value };
+    if (password) data.password = password;
 
     if (type === "staff") {
       data.name = inputs.staffName.value;
       data.email = inputs.staffEmail.value;
       data.role = inputs.staffRole.value; // Admin, Engineer, etc.
-
-      // Enforce Branch for Managers
-      if (!isGlobalAdmin) {
-        data.branch = userBranch;
-      } else {
-        data.branch = inputs.staffBranch.value;
-      }
-
+      data.branchId = inputs.staffBranch.value; // Send ID
       data.secondaryInfo = argsOrEmpty(inputs.staffPhone.value);
       data.displayRole = data.role; // For the badge
     } else if (type === "dealer") {
       data.name = inputs.dealerCompany.value; // Use Company as main name
       data.contactPerson = inputs.dealerContact.value;
       data.email = inputs.dealerEmail.value;
-
-      // Enforce Branch
-      if (!isGlobalAdmin) {
-        data.branch = userBranch;
-      } else {
-        data.branch = inputs.dealerBranch.value;
-      }
-
+      data.branchId = inputs.dealerBranch.value; // Send ID
       data.role = "Dealer";
       data.displayRole = inputs.dealerServiceType.value; // e.g., Sales Partner
       data.secondaryInfo = data.contactPerson;
@@ -126,14 +137,7 @@ window.initManageUsers = function () {
       data.name = inputs.customerCompany.value;
       data.contactPerson = inputs.customerContact.value;
       data.email = inputs.customerEmail.value;
-
-      // Enforce Branch
-      if (!isGlobalAdmin) {
-        data.branch = userBranch;
-      } else {
-        data.branch = inputs.customerBranch.value;
-      }
-
+      data.branchId = inputs.customerBranch.value; // Send ID
       data.role = "Customer";
       data.displayRole = inputs.customerType.value; // Corporate / Individual
       data.secondaryInfo = data.contactPerson;
@@ -144,8 +148,8 @@ window.initManageUsers = function () {
   function argsOrEmpty(str) { return str || "-"; }
 
   // === Render Function ===
-  function renderTable() {
-    let users = window.UserService.getAllUsers();
+  async function renderTable() {
+    let users = await window.UserService.getAllUsers();
 
     // Filter
     const searchTerm = searchInput.value.toLowerCase();
@@ -154,7 +158,7 @@ window.initManageUsers = function () {
     const filteredUsers = users.filter(user => {
       // 1. Branch Restriction (RBAC)
       if (!isGlobalAdmin) {
-        if (user.branch !== userBranch) return false;
+        if (String(user.branch).toLowerCase() !== String(userBranch).toLowerCase()) return false;
       }
 
       // Safe check for properties since data structure varies slightly
@@ -163,9 +167,11 @@ window.initManageUsers = function () {
       const contact = (user.contactPerson || "").toLowerCase();
 
       const matchesSearch = name.includes(searchTerm) || email.includes(searchTerm) || contact.includes(searchTerm);
-      const matchesBranch = branchTerm === "" || user.branch === branchTerm;
+      const matchesBranch = branchTerm === "" || String(user.branch).toLowerCase() === String(branchTerm).toLowerCase();
       return matchesSearch && matchesBranch;
     });
+
+    console.log(`🔍 Final filtered users (all): ${filteredUsers.length}`);
 
     tableBody.innerHTML = "";
 
@@ -302,6 +308,7 @@ window.initManageUsers = function () {
       accountTypeSelector.value = "staff"; // Default
       updateFormVisibility();
       inputs.id.value = "";
+      inputs.password.value = "";
 
       // RBAC: Auto-set branch again (reset clears it)
       if (!isGlobalAdmin) {
@@ -327,37 +334,38 @@ window.initManageUsers = function () {
   });
 
   // Form Submit
-  userForm.addEventListener("submit", (e) => {
+  userForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     const formData = getFormData();
 
     if (formData.id) {
-      window.UserService.updateUser(formData.id, formData);
-      alert("User updated successfully!");
+      await window.UserService.updateUser(formData.id, formData);
+      window.ToastService.success("User updated successfully!");
     } else {
-      window.UserService.addUser(formData);
-      alert("User added successfully!");
+      await window.UserService.addUser(formData);
+      window.ToastService.success("User added successfully!");
     }
     closeModal();
-    renderTable();
+    await renderTable();
   });
 
   // Table Actions
-  tableBody.addEventListener("click", (e) => {
+  tableBody.addEventListener("click", async (e) => {
     const btn = e.target.closest("button");
     if (!btn) return;
     const id = btn.dataset.id;
     if (!id) return;
 
     if (btn.classList.contains("edit-btn")) {
-      const user = window.UserService.getAllUsers().find(u => u.id == id);
+      const users = await window.UserService.getAllUsers();
+      const user = users.find(u => u.id == id);
       if (user) openModal(true, user);
     }
 
     if (btn.classList.contains("delete-btn")) {
       if (confirm("Are you sure you want to delete this account?")) {
-        window.UserService.deleteUser(id);
-        renderTable();
+        await window.UserService.deleteUser(id);
+        await renderTable();
       }
     }
   });

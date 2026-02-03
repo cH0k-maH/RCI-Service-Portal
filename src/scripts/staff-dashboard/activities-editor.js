@@ -10,33 +10,54 @@ window.initActivitiesEditor = function () {
     let currentEditDay = null;
 
     const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
-    const mockData = {
-        "Monday": { axis: "Lekki / Ajah", staff: "Sarah, John" },
-        "Tuesday": { axis: "Ikeja / Gbagada", staff: "Peter, Paul" },
-        "Wednesday": { axis: "Victoria Island", staff: "Mike, John" },
-        "Thursday": { axis: "Apapa / Surulere", staff: "Emmanuel" },
-        "Friday": { axis: "Office Day", staff: "All Staff" }
-    };
+    let mockData = {}; // Will be populated from backend
+
+    async function loadWeeklyRoster() {
+        try {
+            const res = await fetch('http://localhost:5000/api/activities/weekly');
+            const data = await res.json();
+            // Backend returns object keyed by Day, if empty use mocks or empty
+            if (Object.keys(data).length > 0) {
+                mockData = data;
+            } else {
+                // Default structure if empty
+                mockData = {
+                    "Monday": { axis: "Not Set", staff: "None" },
+                    "Tuesday": { axis: "Not Set", staff: "None" },
+                    "Wednesday": { axis: "Not Set", staff: "None" },
+                    "Thursday": { axis: "Not Set", staff: "None" },
+                    "Friday": { axis: "Not Set", staff: "None" }
+                };
+            }
+            renderWeekly();
+        } catch (e) {
+            console.error("Failed to load roster", e);
+        }
+    }
 
     function renderWeekly() {
         if (!weeklyRows) return;
-        weeklyRows.innerHTML = days.map(day => `
+        weeklyRows.innerHTML = days.map(day => {
+            const dayData = mockData[day] || { axis: "-", staff: "-" };
+            return `
             <tr class="hover:bg-gray-50 transition cursor-pointer group">
                 <td class="p-4 font-black text-gray-800">${day}</td>
-                <td class="p-4 text-sm text-gray-500 font-medium italic">${mockData[day].axis}</td>
-                <td class="p-4 text-xs text-gray-400">${mockData[day].staff}</td>
+                <td class="p-4 text-sm text-gray-500 font-medium italic">${dayData.axis}</td>
+                <td class="p-4 text-xs text-gray-400">${dayData.staff}</td>
                 <td class="p-4">
                     <button onclick="openEditModal('${day}')" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition"><i class="fas fa-edit"></i></button>
                 </td>
             </tr>
-        `).join('');
+        `}).join('');
     }
 
     window.openEditModal = (day) => {
         currentEditDay = day;
+        const dayData = mockData[day] || { axis: "", staff: "" };
+
         document.getElementById("edit-modal-title").textContent = `Edit ${day}`;
-        document.getElementById("edit-axis").value = mockData[day].axis;
-        document.getElementById("edit-staff").value = mockData[day].staff;
+        document.getElementById("edit-axis").value = dayData.axis;
+        document.getElementById("edit-staff").value = dayData.staff;
 
         modal.classList.remove("hidden");
         setTimeout(() => modalContent.classList.remove("scale-95", "opacity-0"), 10);
@@ -47,12 +68,30 @@ window.initActivitiesEditor = function () {
         setTimeout(() => modal.classList.add("hidden"), 200);
     };
 
-    window.saveCell = () => {
+    window.saveCell = async () => {
         if (currentEditDay) {
-            mockData[currentEditDay].axis = document.getElementById("edit-axis").value;
-            mockData[currentEditDay].staff = document.getElementById("edit-staff").value;
+            const axis = document.getElementById("edit-axis").value;
+            const staff = document.getElementById("edit-staff").value;
+
+            // Optimistic UI Update
+            if (!mockData[currentEditDay]) mockData[currentEditDay] = {};
+            mockData[currentEditDay].axis = axis;
+            mockData[currentEditDay].staff = staff;
             renderWeekly();
             closeEditModal();
+
+            // Persist
+            try {
+                await fetch('http://localhost:5000/api/activities/weekly', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ day: currentEditDay, axis, staff })
+                });
+                window.ToastService.success("Roster updated");
+            } catch (e) {
+                console.error("Failed to save roster", e);
+                window.ToastService.error("Failed to save changes");
+            }
         }
     };
 
@@ -72,5 +111,5 @@ window.initActivitiesEditor = function () {
         document.getElementById("secWeeklyBtn").className = "px-6 py-2 text-xs font-bold rounded-xl text-gray-500 hover:bg-gray-100 transition";
     };
 
-    renderWeekly();
+    loadWeeklyRoster();
 };

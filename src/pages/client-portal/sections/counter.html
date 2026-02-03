@@ -1,0 +1,71 @@
+<!-- CUSTOMER MACHINE COUNTER -->
+<div class="space-y-8 animate-fadeIn pb-24">
+    <div class="max-w-4xl mx-auto space-y-12">
+        <div class="text-center">
+            <h2 class="text-3xl font-black text-gray-800 tracking-tighter uppercase">Machine Counter</h2>
+            <p class="text-sm text-gray-400 font-bold uppercase tracking-widest mt-1">Submit equipment readings for
+                preventative maintenance</p>
+        </div>
+
+        <!-- COUNTER CARD -->
+        <div
+            class="bg-white p-8 md:p-12 rounded-[40px] shadow-sm border border-gray-100 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <div class="space-y-6">
+                <div
+                    class="w-16 h-16 bg-red-50 text-red-600 rounded-2xl flex items-center justify-center text-2xl shadow-sm border border-red-100">
+                    <i class="fas fa-tachometer-alt"></i>
+                </div>
+                <h3 class="text-2xl font-black text-gray-800 tracking-tight">Pramac GSW 22<br><span
+                        class="text-gray-400 text-sm font-bold uppercase tracking-widest">SN: 2023-X991</span></h3>
+                <div class="bg-slate-50 p-6 rounded-3xl border border-gray-100">
+                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Last Reading</p>
+                    <p class="text-2xl font-black text-gray-800 tracking-tighter">4,250 <span
+                            class="text-xs text-gray-400 font-bold uppercase">Hours</span></p>
+                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-2">Submitted: Jan 05,
+                        2024</p>
+                </div>
+            </div>
+
+            <form class="space-y-6">
+                <div>
+                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 block">New Hour
+                        Reading</label>
+                    <input type="number" step="1"
+                        class="w-full p-6 bg-gray-50 border-none rounded-3xl focus:ring-2 focus:ring-red-100 font-black text-2xl tracking-tighter"
+                        placeholder="0000">
+                </div>
+                <div>
+                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 block">Proof Photo
+                        (Optional)</label>
+                    <div
+                        class="relative bg-gray-50 border-2 border-dashed border-gray-100 rounded-3xl p-6 text-center hover:border-red-100 transition cursor-pointer">
+                        <i class="fas fa-camera text-gray-300 mb-2"></i>
+                        <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Snap Dial</p>
+                    </div>
+                </div>
+                <button type="submit"
+                    class="w-full bg-red-600 text-white py-4 rounded-3xl font-black uppercase tracking-widest shadow-xl shadow-red-50 hover:bg-red-700 transition transform active:scale-95">Update
+                    Counter</button>
+            </form>
+        </div>
+
+        <!-- HISTORY -->
+        <div class="space-y-6">
+            <h4 class="font-black text-gray-800 uppercase tracking-tight">Reading History</h4>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white p-6 rounded-3xl border border-gray-100">
+                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Dec 15</p>
+                    <p class="text-xl font-black text-gray-800 tracking-tighter">4,120 Hrs</p>
+                </div>
+                <div class="bg-white p-6 rounded-3xl border border-gray-100">
+                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Nov 28</p>
+                    <p class="text-xl font-black text-gray-800 tracking-tighter">3,980 Hrs</p>
+                </div>
+                <div class="bg-white p-6 rounded-3xl border border-gray-100">
+                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Nov 10</p>
+                    <p class="text-xl font-black text-gray-800 tracking-tighter">3,850 Hrs</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

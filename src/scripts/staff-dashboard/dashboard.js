@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // Allow 'admin' to peek, but primarily for 'staff'
     if (role !== "staff" && role !== "admin") {
-        alert("Access denied. Please log in.");
+        window.ToastService.error("Access denied. Please log in.");
         window.location.href = "../../../index.html";
         return;
     }
@@ -90,9 +90,21 @@ document.addEventListener("DOMContentLoaded", async () => {
     function updateProfileUI() {
         const nameEl = document.getElementById("user-name");
         const roleEl = document.getElementById("user-role");
+        const initialsEl = document.getElementById("topbar-initials");
+        const avatarImg = document.getElementById("topbar-avatar-img");
 
         if (nameEl) nameEl.textContent = userName;
         if (roleEl) roleEl.textContent = `${staffType} • ${branch}`;
+
+        if (window.UserService && initialsEl) {
+            initialsEl.textContent = window.UserService.getInitials(userName);
+            const savedPic = localStorage.getItem("userProfilePic");
+            if (savedPic && avatarImg) {
+                avatarImg.src = savedPic;
+                avatarImg.classList.remove("hidden");
+                initialsEl.classList.add("hidden");
+            }
+        }
     }
 
     // ===============================
@@ -156,6 +168,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Apply Logic
     applyRolePermissions(); // Hide menu items based on staffType
     updateProfileUI();      // Update Topbar info
+
+    // Initialize Notifications
+    if (window.NotificationUI) {
+        const userId = localStorage.getItem("userId") || 3; // Fallback for staff
+        window.NotificationUI.init(userId, 'staff');
+    }
 
     // Handle Routing
     function handleHashChange() {

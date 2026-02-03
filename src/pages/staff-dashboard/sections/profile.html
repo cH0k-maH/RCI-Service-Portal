@@ -1,0 +1,57 @@
+<div class="space-y-6 animate-fadeIn">
+    <div>
+        <h3 class="text-2xl font-bold text-gray-800">My Profile</h3>
+        <p class="text-gray-500">Manage your personal information and profile picture.</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Profile Picture Card -->
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center">
+            <div id="profile-picture-container" class="relative group">
+                <div id="profile-preview-wrapper"
+                    class="w-32 h-32 rounded-full bg-red-100 border-4 border-white shadow-md flex items-center justify-center text-red-600 text-3xl font-bold overflow-hidden">
+                    <img id="profile-preview-img" class="hidden w-full h-full object-cover">
+                    <span id="profile-initials">S</span>
+                </div>
+                <label for="profile-upload"
+                    class="absolute bottom-0 right-0 bg-red-600 text-white p-2 rounded-full cursor-pointer shadow-lg hover:bg-red-700 transition transform hover:scale-110">
+                    <i class="fas fa-camera text-sm"></i>
+                </label>
+                <input type="file" id="profile-upload" class="hidden" accept="image/*">
+            </div>
+            <h4 id="profile-name-display" class="mt-4 text-lg font-bold text-gray-800">Staff Member</h4>
+            <p id="profile-role-display" class="text-sm text-gray-500 uppercase">Engineer</p>
+        </div>
+
+        <!-- Details Card -->
+        <div class="md:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+            <h4 class="text-lg font-bold text-gray-800 mb-6">Account Details</h4>
+            <form id="profile-form" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="space-y-1">
+                        <label class="text-xs font-bold text-gray-400 uppercase">Full Name</label>
+                        <input type="text" id="prof-name"
+                            class="w-full px-4 py-2 bg-gray-50 border border-gray-100 rounded-lg focus:ring-2 focus:ring-red-500 outline-none"
+                            readonly>
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-xs font-bold text-gray-400 uppercase">Role / Position</label>
+                        <input type="text" id="prof-role"
+                            class="w-full px-4 py-2 bg-gray-50 border border-gray-100 rounded-lg outline-none" readonly>
+                    </div>
+                </div>
+                <div class="space-y-1">
+                    <label class="text-xs font-bold text-gray-400 uppercase">Email Address</label>
+                    <input type="email" id="prof-email"
+                        class="w-full px-4 py-2 bg-gray-50 border border-gray-100 rounded-lg outline-none" readonly>
+                </div>
+                <div class="pt-4 flex justify-end">
+                    <button type="submit"
+                        class="bg-red-600 text-white px-8 py-2 rounded-lg font-bold hover:bg-red-700 shadow-md transition transform active:scale-95">
+                        Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

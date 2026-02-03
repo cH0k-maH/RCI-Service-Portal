@@ -1,0 +1,86 @@
+<!-- Client Sidebar -->
+<div class="flex flex-col h-full">
+    <!-- Logo -->
+    <div class="h-20 flex items-center px-8 border-b border-gray-50">
+        <h1 class="text-xl font-black text-red-600 tracking-tighter uppercase">RCI <span
+                class="text-gray-900">Portal</span></h1>
+    </div>
+
+    <!-- Nav -->
+    <nav class="flex-1 py-8 px-4 space-y-2 overflow-y-auto">
+
+        <button data-section="overview"
+            class="flex items-center w-full px-4 py-3 rounded-2xl text-gray-500 hover:bg-gray-50 font-bold transition group">
+            <i class="fas fa-grid-2 mr-3 w-5 text-center group-hover:text-red-600"></i>
+            <span>Overview</span>
+        </button>
+
+        <!-- DEALER ONLY -->
+        <button data-section="requests" data-role="dealer"
+            class="flex items-center w-full px-4 py-3 rounded-2xl text-gray-500 hover:bg-gray-50 font-bold transition hidden group">
+            <i class="fas fa-file-signature mr-3 w-5 text-center group-hover:text-red-600"></i>
+            <span>Requests</span>
+        </button>
+        <button data-section="statements" data-role="dealer"
+            class="flex items-center w-full px-4 py-3 rounded-2xl text-gray-500 hover:bg-gray-50 font-bold transition hidden group">
+            <i class="fas fa-wallet mr-3 w-5 text-center group-hover:text-red-600"></i>
+            <span>Statements</span>
+        </button>
+
+        <!-- CUSTOMER ONLY -->
+        <button data-section="service-request" data-role="customer"
+            class="flex items-center w-full px-4 py-3 rounded-2xl text-gray-500 hover:bg-gray-50 font-bold transition hidden group">
+            <i class="fas fa-tools mr-3 w-5 text-center group-hover:text-red-600"></i>
+            <span>Request Service</span>
+        </button>
+        <button data-section="counter" data-role="customer"
+            class="flex items-center w-full px-4 py-3 rounded-2xl text-gray-500 hover:bg-gray-50 font-bold transition hidden group">
+            <i class="fas fa-tachometer-alt mr-3 w-5 text-center group-hover:text-red-600"></i>
+            <span>Machine Counter</span>
+        </button>
+
+        <!-- SHARED -->
+        <button data-section="history"
+            class="flex items-center w-full px-4 py-3 rounded-2xl text-gray-500 hover:bg-gray-50 font-bold transition group">
+            <i class="fas fa-history mr-3 w-5 text-center group-hover:text-red-600"></i>
+            <span>History</span>
+        </button>
+        <button data-section="documents"
+            class="flex items-center w-full px-4 py-3 rounded-2xl text-gray-500 hover:bg-gray-50 font-bold transition group">
+            <i class="fas fa-folder-open mr-3 w-5 text-center group-hover:text-red-600"></i>
+            <span>Documents</span>
+        </button>
+
+        <div class="h-8"></div>
+
+        <button data-section="profile"
+            class="flex items-center w-full px-4 py-3 rounded-2xl text-gray-500 hover:bg-gray-50 font-bold transition group">
+            <i class="fas fa-cog mr-3 w-5 text-center group-hover:text-red-600"></i>
+            <span>Settings</span>
+        </button>
+    </nav>
+
+    <!-- Support Rep Widget -->
+    <div class="p-6 bg-slate-50 mx-4 mb-4 rounded-3xl border border-gray-100">
+        <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Assigned Rep</p>
+        <div class="flex items-center gap-3">
+            <div
+                class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-red-600 shadow-sm border border-gray-100 font-black">
+                SS</div>
+            <div>
+                <p class="text-xs font-black text-gray-800">Sarah Sales</p>
+                <div class="flex gap-2 mt-1">
+                    <a href="#" class="text-[10px] text-red-600 font-bold hover:underline">Message</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Logout -->
+    <div class="p-4 border-t border-gray-50 mt-auto">
+        <button id="logout-btn"
+            class="w-full flex items-center justify-center py-4 text-gray-400 hover:text-red-600 font-black uppercase tracking-widest text-[10px] transition">
+            <i class="fas fa-sign-out-alt mr-2"></i> Logout
+        </button>
+    </div>
+</div>

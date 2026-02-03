@@ -144,8 +144,8 @@ class RoleConfig {
         if (roleKey === "ADMINISTRATOR") roleKey = "ADMIN";
 
         // Default for Customer/Dealer if not in RULES
-        if (user.type === 'customer' || user.type === 'dealer') {
-            return "./src/pages/portal/portal.html"; // Assume customer portal
+        if (user.type === 'customer' || user.type === 'dealer' || roleKey === 'CUSTOMER' || roleKey === 'DEALER') {
+            return "./src/pages/client-portal/client-dashboard.html";
         }
 
         return this.ROLES[roleKey]?.redirectUrl || "./src/pages/login.html";

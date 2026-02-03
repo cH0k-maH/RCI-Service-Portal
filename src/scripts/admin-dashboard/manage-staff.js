@@ -1,4 +1,4 @@
-window.initManageStaff = function () {
+window.initManageStaff = async function () {
     console.log("Manage Staff initialized");
 
     // Check Auth & Permissions
@@ -8,6 +8,8 @@ window.initManageStaff = function () {
         isAdmin: window.AuthService.getRole() === 'admin'
     };
     const isGlobalAdmin = currentUser.isAdmin || (currentUser.role && currentUser.role.toUpperCase() === 'ADMIN');
+    const isManager = currentUser.role && currentUser.role.toUpperCase() === 'MANAGER';
+    const canSeeAll = isGlobalAdmin || isManager;
 
     if (!window.UserService.can(currentUser, "view_branch_users") && !isGlobalAdmin) {
         document.getElementById("dashboard-container").innerHTML = "<div class='p-10 text-red-600'>Access Denied.</div>";
@@ -45,6 +47,27 @@ window.initManageStaff = function () {
     const btnIssueQuery = document.getElementById("btn-issue-query");
     const btnEditProfile = document.getElementById("btn-edit-staff-profile");
 
+    // Task Modal Elements
+    const taskModalOverlay = document.getElementById("task-modal-overlay");
+    const taskForm = document.getElementById("task-form");
+    const closeTaskBtn = document.getElementById("close-task-modal");
+    const cancelTaskBtn = document.getElementById("cancel-task-modal");
+    const taskStaffIdInput = document.getElementById("task-staff-id");
+
+    // Query Modal Elements
+    const queryModalOverlay = document.getElementById("query-modal-overlay");
+    const queryForm = document.getElementById("query-form");
+    const closeQueryBtn = document.getElementById("close-query-modal");
+    const cancelQueryBtn = document.getElementById("cancel-query-modal");
+    const queryStaffIdInput = document.getElementById("query-staff-id");
+
+    // Review Reports Modal Elements
+    const reviewModalOverlay = document.getElementById("review-reports-modal-overlay");
+    const closeReviewBtn = document.getElementById("close-review-modal");
+    const closeReviewBtnBottom = document.getElementById("close-review-btn");
+    const reviewStaffName = document.getElementById("review-reports-staff-name");
+    const staffActivityList = document.getElementById("staff-activity-list");
+
     // Admin-Only: Add Staff Button
     if (addUserBtn && !isGlobalAdmin) {
         addUserBtn.style.display = 'none';
@@ -65,58 +88,108 @@ window.initManageStaff = function () {
     if (sectionDealer) sectionDealer.classList.add("hidden");
     if (sectionCustomer) sectionCustomer.classList.add("hidden");
 
+    // === Dynamic Data Loading ===
+    const branches = await window.UserService.getBranches();
+
+    // Populate Filters
+    if (branchFilter) {
+        branchFilter.innerHTML = '<option value="">All Branches</option>';
+        branches.forEach(b => {
+            branchFilter.innerHTML += `<option value="${b.name}">${b.name}</option>`; // Keep name for filtering logic
+        });
+    }
+
+    // Populate Modal Branch Selection
+    const staffBranchSelect = document.getElementById("staff-branch");
+    if (staffBranchSelect) {
+        staffBranchSelect.innerHTML = '<option value="">Select Branch</option>';
+        branches.forEach(b => {
+            staffBranchSelect.innerHTML += `<option value="${b.id}">${b.name}</option>`; // Use ID for saving
+        });
+    }
+
     // Input Fields
     const inputs = {
         id: document.getElementById("user-id"),
         status: document.getElementById("common-status"),
+        password: document.getElementById("common-password"),
         notes: document.getElementById("common-notes"),
         staffName: document.getElementById("staff-name"),
         staffEmail: document.getElementById("staff-email"),
         staffPhone: document.getElementById("staff-phone"),
         staffRole: document.getElementById("staff-role"),
-        staffBranch: document.getElementById("staff-branch"),
+        staffBranch: staffBranchSelect,
         staffId: document.getElementById("staff-id"),
         staffPicture: document.getElementById("staff-picture"),
         staffDropbox: document.getElementById("staff-dropbox")
     };
 
+    // === Sorting Logic ===
+    let sortConfig = { key: null, direction: 'asc' };
+
+    function sortData(data) {
+        if (!sortConfig.key) return data;
+        return [...data].sort((a, b) => {
+            let valA = a[sortConfig.key] || "";
+            let valB = b[sortConfig.key] || "";
+            if (typeof valA === 'string') valA = valA.toLowerCase();
+            if (typeof valB === 'string') valB = valB.toLowerCase();
+
+            if (valA < valB) return sortConfig.direction === 'asc' ? -1 : 1;
+            if (valA > valB) return sortConfig.direction === 'asc' ? 1 : -1;
+            return 0;
+        });
+    }
+
     // === Render Function ===
-    function renderTable() {
-        let users = window.UserService.getAllUsers();
+    async function renderTable() {
+        let users = await window.UserService.getAllUsers();
+        console.log("🔍 UserService.getAllUsers() returned:", users);
 
         // Filter for STAFF only
-        users = users.filter(u => u.type !== 'customer' && u.type !== 'dealer');
+        users = users.filter(u => String(u.type).toLowerCase() === 'staff');
+        console.log(`🔍 After staff filter: ${users.length} users left`);
+
+        // Apply Sorting
+        users = sortData(users);
 
         // Filters
-        const searchTerm = searchInput.value.toLowerCase();
+        const searchTerm = (searchInput.value || "").toLowerCase();
         const deptTerm = deptFilter ? deptFilter.value : "";
         const statusTerm = statusFilter ? statusFilter.value : "";
 
         // Enforce Branch
         let branchTerm = branchFilter ? branchFilter.value : "";
-        if (!isGlobalAdmin) {
+        if (!canSeeAll) {
             branchTerm = currentUser.branch;
             if (branchFilter) {
                 branchFilter.value = branchTerm;
                 branchFilter.style.display = "none";
-                branchFilter.parentElement.style.display = "none"; // Hide the parent label/container too
+                branchFilter.parentElement.style.display = "none";
             }
-        } else {
-            // Admin can see the filter
-            if (branchFilter) branchFilter.classList.remove("hidden");
         }
 
-        const filteredUsers = users.filter(user => {
-            // 1. Branch Restriction
-            if (branchTerm && user.branch !== branchTerm) return false;
+        console.log(`🔍 Filtering by: Branch="${branchTerm}", Dept="${deptTerm}", Status="${statusTerm}", Search="${searchTerm}"`);
 
-            // 2. Department/Role Filter
-            if (deptTerm && user.role !== deptTerm) {
-                if (!(deptTerm === 'Logistics' && user.role === 'Driver')) return false;
+        const filteredUsers = users.filter(user => {
+            // 1. Branch Restriction (Case-insensitive)
+            if (branchTerm && String(user.branch).toLowerCase() !== String(branchTerm).toLowerCase()) {
+                return false;
             }
 
-            // 3. Status Filter
-            if (statusTerm && user.status !== statusTerm) return false;
+            // 2. Department/Role Filter (Case-insensitive)
+            if (deptTerm) {
+                const uRole = String(user.role).toLowerCase();
+                const dTerm = String(deptTerm).toLowerCase();
+                if (uRole !== dTerm) {
+                    if (!(dTerm === 'logistics' && (uRole === 'driver' || uRole === 'logistics'))) return false;
+                }
+            }
+
+            // 3. Status Filter (Case-insensitive)
+            if (statusTerm && String(user.status || "Active").toLowerCase() !== String(statusTerm).toLowerCase()) {
+                return false;
+            }
 
             // 4. Search
             const name = (user.name || "").toLowerCase();
@@ -124,11 +197,13 @@ window.initManageStaff = function () {
             return name.includes(searchTerm) || email.includes(searchTerm);
         });
 
+        console.log(`🔍 Final filtered users: ${filteredUsers.length}`);
+
         tableBody.innerHTML = "";
 
         if (filteredUsers.length === 0) {
             noUsersMsg.classList.remove("hidden");
-            noUsersMsg.textContent = "No staff members found.";
+            noUsersMsg.textContent = "No staff members matching your criteria were found.";
         } else {
             noUsersMsg.classList.add("hidden");
 
@@ -169,6 +244,9 @@ window.initManageStaff = function () {
                     <span class="px-2.5 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass}">
                         ${statusStr}
                     </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-medium">
+                    ${user.branch || '-'}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                    <div class="flex items-center">
@@ -267,6 +345,7 @@ window.initManageStaff = function () {
             modalTitle.textContent = "Add New Staff";
             userForm.reset();
             inputs.id.value = "";
+            if (inputs.password) inputs.password.value = "";
             if (!isGlobalAdmin && inputs.staffBranch) inputs.staffBranch.value = currentUser.branch;
         }
     }
@@ -297,13 +376,32 @@ window.initManageStaff = function () {
     if (deptFilter) deptFilter.addEventListener("change", renderTable);
     if (statusFilter) statusFilter.addEventListener("change", renderTable);
 
+    // Sorting
+    const sortBranchHeader = document.getElementById("sort-branch-header");
+    if (sortBranchHeader) {
+        sortBranchHeader.addEventListener("click", () => {
+            if (sortConfig.key === 'branch') {
+                sortConfig.direction = sortConfig.direction === 'asc' ? 'desc' : 'asc';
+            } else {
+                sortConfig.key = 'branch';
+                sortConfig.direction = 'asc';
+            }
+            // Update icon
+            const icon = sortBranchHeader.querySelector("i");
+            if (icon) {
+                icon.className = `fas fa-sort-${sortConfig.direction === 'asc' ? 'up' : 'down'} ml-1 text-red-600`;
+            }
+            renderTable();
+        });
+    }
+
     addUserBtn.addEventListener("click", () => openModal(false));
     closeBtn.addEventListener("click", closeModal);
     cancelBtn.addEventListener("click", closeModal);
     modalOverlay.addEventListener("click", (e) => { if (e.target === modalOverlay) closeModal(); });
 
     // Form Submit
-    userForm.addEventListener("submit", (e) => {
+    userForm.addEventListener("submit", async (e) => {
         e.preventDefault();
 
         const data = {
@@ -314,11 +412,14 @@ window.initManageStaff = function () {
             name: inputs.staffName.value,
             email: inputs.staffEmail.value,
             role: inputs.staffRole.value,
-            branch: !isGlobalAdmin ? currentUser.branch : inputs.staffBranch.value,
+            branchId: inputs.staffBranch.value, // Send ID
             secondaryInfo: inputs.staffPhone.value,
             dropboxLink: inputs.staffDropbox ? inputs.staffDropbox.value : ""
-            // Picture handling would involve FileReader or upload logic, for now we log it
         };
+
+        if (inputs.password && inputs.password.value) {
+            data.password = inputs.password.value;
+        }
 
         if (inputs.staffPicture && inputs.staffPicture.files[0]) {
             console.log("Picture selected:", inputs.staffPicture.files[0].name);
@@ -326,24 +427,25 @@ window.initManageStaff = function () {
         }
 
         if (data.id) {
-            window.UserService.updateUser(data.id, data);
-            alert("Staff updated successfully!");
+            await window.UserService.updateUser(data.id, data);
+            window.ToastService.success("Staff updated successfully!");
         } else {
-            window.UserService.addUser(data);
-            alert("Staff added successfully!");
+            await window.UserService.addUser(data);
+            window.ToastService.success("Staff added successfully!");
         }
         closeModal();
-        renderTable();
+        await renderTable();
     });
 
     // Table Actions (Legacy / Supporting specific clicks)
-    tableBody.addEventListener("click", (e) => {
+    tableBody.addEventListener("click", async (e) => {
         const btn = e.target.closest("button");
         if (!btn) return;
         const id = btn.dataset.id;
         if (!id) return;
 
-        const user = window.UserService.getAllUsers().find(u => u.id == id);
+        const users = await window.UserService.getAllUsers();
+        const user = users.find(u => u.id == id);
         if (!user) return;
 
         if (btn.classList.contains("edit-btn")) {
@@ -371,16 +473,137 @@ window.initManageStaff = function () {
 
     // Action Triggers
     function triggerAssignTask(user) {
-        alert(`📝 Task Assignment for ${user ? user.name : "Staff"}\nTargeting: ${user ? user.branch : 'Branch'}\nFeatures: Job Type, Deadline, Priority, Descriptions\nComing Soon!`);
+        if (!user) return;
+        taskStaffIdInput.value = user.id;
+        document.querySelector("#task-modal-overlay h3").textContent = `Assign Task to ${user.name}`;
+        taskModalOverlay.classList.remove("hidden");
     }
+
+    if (btnReviewReports) {
+        btnReviewReports.addEventListener("click", () => {
+            if (!activeActionUser) return;
+            openReviewReportsModal(activeActionUser);
+        });
+    }
+
+    if (btnIssueQuery) {
+        btnIssueQuery.addEventListener("click", () => {
+            if (!activeActionUser) return;
+            openQueryModal(activeActionUser);
+        });
+    }
+
+    // === Review Reports Logic ===
+    function openReviewReportsModal(user) {
+        closeActionModal();
+        reviewModalOverlay.classList.remove("hidden");
+        reviewStaffName.textContent = `Activity Log: ${user.name} (${user.role})`;
+
+        // Fetch & Render Activities
+        staffActivityList.innerHTML = '<div class="text-center text-gray-400 mt-10"><i class="fas fa-spinner fa-spin text-2xl mb-2"></i><p>Loading records...</p></div>';
+
+        setTimeout(() => {
+            const logs = window.ReportService.getActivityLog(); // In real app, pass user.id
+            // Mock Filter: Show logs relevant to this user or general logs if none specific
+            // For now, allow all logs but add a "dummy" specific one
+
+            const specificLogs = [
+                { date: new Date().toISOString().split('T')[0], type: 'System', text: `User ${user.name} logged in`, branch: user.branch },
+                ...logs
+            ];
+
+            if (specificLogs.length === 0) {
+                staffActivityList.innerHTML = '<p class="text-center text-gray-500 mt-10">No recent activity found.</p>';
+            } else {
+                staffActivityList.innerHTML = '';
+                specificLogs.forEach(log => {
+                    const icon = log.type === 'Service' ? 'fa-tools text-blue-500' : 'fa-info-circle text-gray-400';
+                    const bgClass = log.type === 'Service' ? 'bg-blue-50' : 'bg-gray-50';
+
+                    staffActivityList.innerHTML += `
+                        <div class="flex gap-4 mb-4 p-3 rounded-lg ${bgClass} border border-gray-100">
+                            <div class="mt-1"><i class="fas ${icon}"></i></div>
+                            <div>
+                                <div class="text-xs text-gray-400 font-mono">${log.date} • ${log.branch || 'General'}</div>
+                                <div class="text-sm text-gray-800 font-medium">${log.text}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+        }, 500); // Simulate network delay
+    }
+
+    function closeReviewModal() {
+        reviewModalOverlay.classList.add("hidden");
+    }
+
+    if (closeReviewBtn) closeReviewBtn.onclick = closeReviewModal;
+    if (closeReviewBtnBottom) closeReviewBtnBottom.onclick = closeReviewModal;
+
     function triggerReviewReports(user) {
-        alert(`📊 Staff Performance: ${user ? user.name : "Staff"}\nReviewing: Attendance, Jobs Completed, Sales Targets\nComing Soon!`);
+        window.ToastService.info(`📊 Staff Performance: ${user ? user.name : "Staff"} - Coming Soon!`);
     }
+
     function triggerIssueQuery(user) {
-        const reason = prompt(`Issue Official Query to ${user ? user.name : "Staff"}:\nReason:`);
-        if (reason) {
-            alert("Query issued and logged. Staff will be notified via email.");
-        }
+        if (!user) return;
+        queryStaffIdInput.value = user.id;
+        document.querySelector("#query-modal-overlay h3").textContent = `Query for ${user.name}`;
+        queryModalOverlay.classList.remove("hidden");
+    }
+
+    // Modal Close Handlers
+    const closeTaskModal = () => taskModalOverlay.classList.add("hidden");
+    if (closeTaskBtn) closeTaskBtn.onclick = closeTaskModal;
+    if (cancelTaskBtn) cancelTaskBtn.onclick = closeTaskModal;
+
+    const closeQueryModal = () => queryModalOverlay.classList.add("hidden");
+    if (closeQueryBtn) closeQueryBtn.onclick = closeQueryModal;
+    if (cancelQueryBtn) cancelQueryBtn.onclick = closeQueryModal;
+
+    // Form Submissions
+    if (taskForm) {
+        taskForm.onsubmit = async (e) => {
+            e.preventDefault();
+            const taskData = {
+                staffId: taskStaffIdInput.value,
+                title: document.getElementById("task-title").value,
+                description: document.getElementById("task-desc").value,
+                priority: document.getElementById("task-priority").value,
+                dueDate: document.getElementById("task-due-date").value,
+                assignedBy: localStorage.getItem("userId") || 1
+            };
+
+            const res = await window.AdminToolService.assignTask(taskData);
+            if (!res.error) {
+                window.ToastService.success(`Task assigned to ${activeActionUser ? activeActionUser.name : 'Staff'}!`);
+                closeTaskModal();
+                taskForm.reset();
+            } else {
+                window.ToastService.error("Failed to assign task.");
+            }
+        };
+    }
+
+    if (queryForm) {
+        queryForm.onsubmit = async (e) => {
+            e.preventDefault();
+            const queryData = {
+                staffId: queryStaffIdInput.value,
+                title: document.getElementById("query-title").value,
+                reason: document.getElementById("query-reason").value,
+                issuedBy: localStorage.getItem("userId") || 1
+            };
+
+            const res = await window.AdminToolService.issueQuery(queryData);
+            if (!res.error) {
+                window.ToastService.success(`Official Query issued to ${activeActionUser ? activeActionUser.name : 'Staff'}.`);
+                closeQueryModal();
+                queryForm.reset();
+            } else {
+                window.ToastService.error("Failed to issue query.");
+            }
+        };
     }
 
     renderTable();

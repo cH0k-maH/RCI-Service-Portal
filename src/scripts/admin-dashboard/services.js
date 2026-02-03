@@ -273,12 +273,12 @@ window.initServices = function () {
         if (inputId.value) {
             // Update
             window.ServiceService.updateService(inputId.value, formData);
-            alert("Service updated!");
+            window.ToastService.success("Service updated!");
         } else {
             // Create
             formData.startDate = new Date().toISOString().split('T')[0];
             window.ServiceService.addService(formData);
-            alert("Service created!");
+            window.ToastService.success("Service created!");
         }
         closeModal();
         renderTable(); // Triggers updateKpiCards

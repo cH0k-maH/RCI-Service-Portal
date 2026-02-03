@@ -124,7 +124,7 @@ window.initSettings = function () {
                 });
             }
 
-            alert("Settings saved successfully!");
+            window.ToastService.success("Settings saved successfully!");
         });
     });
 

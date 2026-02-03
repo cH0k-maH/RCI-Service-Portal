@@ -15,82 +15,40 @@ class AuthService {
      * @returns {Promise<{success: boolean, message?: string, role?: string}>}
      */
     async login(email, password) {
-        // Simmons a network delay
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                // 1. HARDCODED MOCKS (For Quick Testing)
-                if (email === "admin@rci.com" && password === "admin123") {
-                    this._setSession("admin", "Admin User", "admin", "Lagos");
-                    resolve({ success: true, role: "admin" });
-                    return;
-                }
-                if (email === "manager@rci.com" && password === "manager123") {
-                    this._setSession("staff", "Chioma Manager", "Manager", "Lagos");
-                    resolve({ success: true, role: "staff" });
-                    return;
-                }
-                if (email === "staff@rci.com" && password === "staff123") {
-                    this._setSession("staff", "Emeka Engineer", "Engineer", "Lagos");
-                    resolve({ success: true, role: "staff" });
-                    return;
-                }
-                if (email === "engineer@rci.com" && password === "eng123") {
-                    this._setSession("staff", "Emmanuel Engineer", "Engineer", "Lagos");
-                    resolve({ success: true, role: "staff" });
-                    return;
-                }
-                if (email === "sales@rci.com" && password === "sales123") {
-                    this._setSession("staff", "Sarah Sales", "Sales", "Lagos");
-                    resolve({ success: true, role: "staff" });
-                    return;
-                }
-                if (email === "secretary@rci.com" && password === "sec123") {
-                    this._setSession("staff", "Bimbo Secretary", "Secretary", "Lagos");
-                    resolve({ success: true, role: "staff" });
-                    return;
-                }
-                if (email === "driver@rci.com" && password === "drive123") {
-                    this._setSession("staff", "Dan Driver", "Driver", "Lagos");
-                    resolve({ success: true, role: "staff" });
-                    return;
-                }
+        try {
+            const response = await fetch("http://localhost:5000/api/auth/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ email, password })
+            });
 
-                // 2. CHECK DYNAMIC USERS (From Admin Creation)
-                // Note: In real app, this is API. Here we check localStorage "database".
-                // We assume a default password hierarchy or check against something stored.
-                // For prototype: If user exists in UserService and password is 'rci123', allow login.
+            const data = await response.json();
 
-                const allUsers = window.UserService ? window.UserService.getAllUsers() : [];
-                const foundUser = allUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
-
-                if (foundUser) {
-                    // Simple password check for prototype
-                    if (password === "rci123") {
-                        const systemRole = foundUser.role === "Admin" ? "admin" :
-                            (foundUser.type === "staff" ? "staff" : "customer");
-
-                        this._setSession(
-                            systemRole,
-                            foundUser.name,
-                            foundUser.role, // e.g. "Engineer", "Sales"
-                            foundUser.branch || "Lagos"
-                        );
-                        resolve({ success: true, role: systemRole });
-                        return;
-                    }
-                }
-
-                resolve({ success: false, message: "Invalid email or password." });
-            }, 800);
-        });
+            if (response.ok) {
+                // Success: data contains { token, user }
+                this._setSession(data);
+                return { success: true, role: data.user.type };
+            } else {
+                // Error: data contains { message }
+                return { success: false, message: data.message || "Login failed" };
+            }
+        } catch (error) {
+            console.error("AuthService Login Error:", error);
+            return { success: false, message: "Server connection error. Please try again later." };
+        }
     }
 
-    _setSession(role, name, type, branch) {
-        this.userRole = role;
-        localStorage.setItem("userRole", role);
-        localStorage.setItem("userName", name);
-        localStorage.setItem("staffType", type.toLowerCase()); // engineer, sales, etc.
-        localStorage.setItem("branch", branch);
+    _setSession(data) {
+        const { token, user } = data;
+        this.userRole = user.type; // staff, admin, client
+
+        localStorage.setItem("authToken", token);
+        localStorage.setItem("userRole", user.type);
+        localStorage.setItem("userName", user.name);
+        localStorage.setItem("staffType", (user.role || user.staffType).toLowerCase());
+        localStorage.setItem("branch", user.branch || "N/A");
     }
 
     /**
@@ -99,6 +57,9 @@ class AuthService {
     logout() {
         this.userRole = null;
         localStorage.removeItem("userRole");
+        localStorage.removeItem("userName");
+        localStorage.removeItem("staffType");
+        localStorage.removeItem("branch");
         window.location.reload();
     }
 
